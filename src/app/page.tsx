@@ -81,6 +81,10 @@ export default function Home() {
       fetchApartments(currentFilters);
    };
 
+   const handleApartmentUpdated = () => {
+      fetchApartments(currentFilters);
+   };
+
    return (
       <div className="min-h-screen bg-gray-50">
          <div className="container mx-auto px-4 py-8">
@@ -131,6 +135,7 @@ export default function Home() {
                <ApartmentList
                   apartments={apartments}
                   onApartmentDeleted={handleApartmentDeleted}
+                  onApartmentUpdated={handleApartmentUpdated}
                />
             </div>
          </div>
