@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+const withPWA = require("next-pwa")({
+  dest: "public", // Carpeta donde se guardará el service worker
+  register: true,
+  skipWaiting: true,
+});
+
+
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
@@ -13,4 +20,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
