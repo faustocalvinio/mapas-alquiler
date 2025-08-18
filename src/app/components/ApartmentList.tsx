@@ -259,11 +259,11 @@ export default function ApartmentList({
 
    if (apartments.length === 0) {
       return (
-         <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
                Lista de Apartamentos
             </h2>
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                No hay apartamentos registrados
             </div>
          </div>
@@ -271,47 +271,47 @@ export default function ApartmentList({
    }
 
    return (
-      <div className="bg-white rounded-lg shadow-md p-6">
-         <h2 className="text-xl font-semibold text-gray-800 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
             Lista de Apartamentos ({apartments.length})
          </h2>
 
          <div className="space-y-4">
             {apartments.map((apartment) => (
                <div key={apartment.id}>
-                  <div className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                      <div className="flex justify-between items-start">
                         <div className="flex-1">
                            <div className="flex flex-wrap items-center gap-4 mb-2">
-                              <h3 className="text-lg font-semibold text-gray-900">
+                              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                                  {apartment.title || "Apartamento"}
                               </h3>
-                              <span className="text-xl font-bold text-blue-600">
+                              <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
                                  {apartment.price}€/mes
                               </span>
                               {apartment.zone && (
-                                 <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded-full">
+                                 <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-sm px-2 py-1 rounded-full">
                                     {apartment.zone}
                                  </span>
                               )}
                            </div>
 
-                           <p className="text-gray-600 mb-2">
+                           <p className="text-gray-600 dark:text-gray-300 mb-2">
                               📍 {apartment.address}
                            </p>
 
                            {apartment.notes && (
                               <div className="mb-2">
-                                 <p className="text-sm font-medium text-gray-700 mb-1">
+                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Notas:
                                  </p>
-                                 <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                                 <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-2 rounded">
                                     {apartment.notes}
                                  </p>
                               </div>
                            )}
 
-                           <p className="text-xs text-gray-500">
+                           <p className="text-xs text-gray-500 dark:text-gray-400">
                               Agregado: {formatDate(apartment.createdAt)}
                            </p>
                         </div>
@@ -320,7 +320,7 @@ export default function ApartmentList({
                            <button
                               onClick={() => handleEdit(apartment)}
                               disabled={editingId === apartment.id}
-                              className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+                              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 dark:bg-blue-500 dark:hover:bg-blue-600 dark:disabled:bg-blue-300 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2"
                               title="Editar apartamento"
                            >
                               <svg
@@ -347,7 +347,7 @@ export default function ApartmentList({
                                  deletingId === apartment.id ||
                                  editingId === apartment.id
                               }
-                              className="bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2"
+                              className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 dark:bg-red-500 dark:hover:bg-red-600 dark:disabled:bg-red-300 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center gap-2"
                               title="Eliminar apartamento"
                            >
                               {deletingId === apartment.id ? (
@@ -398,14 +398,14 @@ export default function ApartmentList({
 
                   {/* Formulario de edición inline */}
                   {editingId === apartment.id && (
-                     <div className="mt-2 bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                     <div className="mt-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                            Editando apartamento
                         </h4>
 
                         <form onSubmit={handleSubmitEdit} className="space-y-4">
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                  Título (opcional)
                               </label>
                               <input
@@ -413,13 +413,13 @@ export default function ApartmentList({
                                  name="title"
                                  value={formData.title}
                                  onChange={handleInputChange}
-                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                 className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
                                  placeholder="Ej: Apartamento céntrico"
                               />
                            </div>
 
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                  Dirección *
                               </label>
                               <input
@@ -427,14 +427,14 @@ export default function ApartmentList({
                                  name="address"
                                  value={formData.address}
                                  onChange={handleInputChange}
-                                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                 className={`w-full px-3 py-2 bg-white dark:bg-gray-800 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 ${
                                     errors.address
                                        ? "border-red-500"
                                        : addressValidation.isValid === true
                                        ? "border-green-500"
                                        : addressValidation.isValid === false
                                        ? "border-red-500"
-                                       : "border-gray-300"
+                                       : "border-gray-300 dark:border-gray-600"
                                  }`}
                                  placeholder="Calle Gran Vía, 1, Madrid"
                                  required
@@ -442,7 +442,7 @@ export default function ApartmentList({
 
                               {/* Indicadores de validación de dirección */}
                               {addressValidation.isValidating && (
-                                 <div className="flex items-center mt-1 text-sm text-blue-600">
+                                 <div className="flex items-center mt-1 text-sm text-blue-600 dark:text-blue-400">
                                     <svg
                                        className="animate-spin h-4 w-4 mr-1"
                                        fill="none"
@@ -467,7 +467,7 @@ export default function ApartmentList({
                               )}
 
                               {addressValidation.isValid === true && (
-                                 <div className="flex items-center mt-1 text-sm text-green-600">
+                                 <div className="flex items-center mt-1 text-sm text-green-600 dark:text-green-400">
                                     <svg
                                        className="h-4 w-4 mr-1"
                                        fill="currentColor"
@@ -484,7 +484,7 @@ export default function ApartmentList({
                               )}
 
                               {addressValidation.isValid === false && (
-                                 <div className="flex items-center mt-1 text-sm text-red-600">
+                                 <div className="flex items-center mt-1 text-sm text-red-600 dark:text-red-400">
                                     <svg
                                        className="h-4 w-4 mr-1"
                                        fill="currentColor"
@@ -508,7 +508,7 @@ export default function ApartmentList({
                            </div>
 
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                  Precio (€/mes) *
                               </label>
                               <input
@@ -516,38 +516,38 @@ export default function ApartmentList({
                                  name="price"
                                  value={formData.price}
                                  onChange={handleInputChange}
-                                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                 className={`w-full px-3 py-2 bg-white dark:bg-gray-800 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 ${
                                     errors.price
                                        ? "border-red-500"
-                                       : "border-gray-300"
+                                       : "border-gray-300 dark:border-gray-600"
                                  }`}
                                  placeholder="800"
                                  min="1"
                                  required
                               />
                               {errors.price && (
-                                 <p className="mt-1 text-sm text-red-600">
+                                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                                     {errors.price}
                                  </p>
                               )}
                            </div>
 
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                 Zona (opcional)
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                 Barrio (opcional)
                               </label>
                               <input
                                  type="text"
                                  name="zone"
                                  value={formData.zone}
                                  onChange={handleInputChange}
-                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                 placeholder="Ej: Centro, Salamanca, Chamartín"
+                                 className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
+                                 placeholder="Ej: Malasaña, Salamanca, Chamartín"
                               />
                            </div>
 
                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                  Notas (opcional)
                               </label>
                               <textarea
@@ -555,14 +555,14 @@ export default function ApartmentList({
                                  value={formData.notes}
                                  onChange={handleInputChange}
                                  rows={3}
-                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                 className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 resize-none"
                                  placeholder="Información adicional sobre el apartamento..."
                               />
                            </div>
 
                            {errors.submit && (
-                              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                                 <p className="text-sm text-red-600">
+                              <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600 rounded-md">
+                                 <p className="text-sm text-red-600 dark:text-red-400">
                                     {errors.submit}
                                  </p>
                               </div>
@@ -572,7 +572,7 @@ export default function ApartmentList({
                               <button
                                  type="button"
                                  onClick={handleCancelEdit}
-                                 className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md font-medium transition-colors duration-200"
+                                 className="flex-1 px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md font-medium transition-colors duration-200"
                               >
                                  Cancelar
                               </button>
@@ -584,7 +584,7 @@ export default function ApartmentList({
                                     (formData.address !== apartment.address &&
                                        addressValidation.isValid === false)
                                  }
-                                 className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-md font-medium transition-colors duration-200 flex items-center justify-center gap-2"
+                                 className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 dark:bg-blue-500 dark:hover:bg-blue-600 dark:disabled:bg-blue-300 text-white rounded-md font-medium transition-colors duration-200 flex items-center justify-center gap-2"
                               >
                                  {isSubmitting ? (
                                     <>

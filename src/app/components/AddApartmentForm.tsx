@@ -13,6 +13,160 @@ interface AddressValidation {
    fullAddress?: string;
 }
 
+// Lista de barrios de Madrid
+const MADRID_NEIGHBORHOODS = [
+   "Malasaña",
+   "Chueca",
+   "La Latina",
+   "Lavapiés",
+   "Sol",
+   "Huertas",
+   "Salamanca",
+   "Chamberí",
+   "Conde Duque",
+   "Justicia",
+   "Universidad",
+   "Embajadores",
+   "Cortes",
+   "Palacio",
+   "Recoletos",
+   "Goya",
+   "Lista",
+   "Castellana",
+   "Almagro",
+   "Trafalgar",
+   "Arapiles",
+   "Gaztambide",
+   "Vallehermoso",
+   "Ríos Rosas",
+   "Cuatro Caminos",
+   "Castillejos",
+   "Almenara",
+   "Valdeacederas",
+   "Berruguete",
+   "Bellas Vistas",
+   "Tetuán",
+   "Estrella",
+   "Ibiza",
+   "Jerónimos",
+   "Cortes",
+   "Pacifico",
+   "Adelfas",
+   "Estrella",
+   "Niño Jesús",
+   "Concepción",
+   "Legazpi",
+   "Delicias",
+   "Palos de Moguer",
+   "Atocha",
+   "Arganzuela",
+   "Imperial",
+   "Las Acacias",
+   "La Chopera",
+   "Acacias",
+   "Moscardó",
+   "Usera",
+   "Orcasitas",
+   "Orcasur",
+   "San Fermín",
+   "Almendrales",
+   "Pradolongo",
+   "Carabanchel",
+   "Comillas",
+   "Opañel",
+   "San Isidro",
+   "Vista Alegre",
+   "Puerta Bonita",
+   "Buenavista",
+   "Abrantes",
+   "Latina",
+   "Los Cármenes",
+   "Puerta del Ángel",
+   "Lucero",
+   "Aluche",
+   "Campamento",
+   "Cuatro Vientos",
+   "Las Águilas",
+   "Moncloa",
+   "Argüelles",
+   "Ciudad Universitaria",
+   "Valdezarza",
+   "Valdemarín",
+   "El Plantío",
+   "Casa de Campo",
+   "Chamartín",
+   "El Viso",
+   "Prosperidad",
+   "Ciudad Jardín",
+   "Hispanoamérica",
+   "Nueva España",
+   "Castilla",
+   "Hortaleza",
+   "Palomas",
+   "Valdefuentes",
+   "Canillas",
+   "Pinar del Rey",
+   "Apóstol Santiago",
+   "Valdelatas",
+   "Sanchinarro",
+   "El Goloso",
+   "Fuencarral",
+   "El Pardo",
+   "Fuentelarreina",
+   "Peñagrande",
+   "Barrio del Pilar",
+   "La Paz",
+   "Valverde",
+   "Mirasierra",
+   "El Goloso",
+   "Ciudad Lineal",
+   "Ventas",
+   "Pueblo Nuevo",
+   "Quintana",
+   "La Concepción",
+   "San Pascual",
+   "San Juan Bautista",
+   "Colina",
+   "Atalaya",
+   "Costillares",
+   "Moratalaz",
+   "Pavones",
+   "Horcajo",
+   "Marroquina",
+   "Media Legua",
+   "Fontarrón",
+   "Vinateros",
+   "Vicálvaro",
+   "Ambroz",
+   "Casco Histórico de Vicálvaro",
+   "Villa de Vallecas",
+   "Casco Histórico de Vallecas",
+   "Santa Eugenia",
+   "Ensanche de Vallecas",
+   "Puente de Vallecas",
+   "Entrevías",
+   "San Diego",
+   "Palomeras Bajas",
+   "Palomeras Sureste",
+   "Portazgo",
+   "Numancia",
+   "Barajas",
+   "Alameda de Osuna",
+   "Aeropuerto",
+   "Casco Histórico de Barajas",
+   "Timón",
+   "Corralejos",
+   "San Blas",
+   "Simancas",
+   "Hellín",
+   "Amposta",
+   "Arcos",
+   "Rosas",
+   "Rejas",
+   "Canillejas",
+   "Salvador",
+].sort();
+
 export default function AddApartmentForm({
    onApartmentAdded,
 }: AddApartmentFormProps) {
@@ -20,7 +174,7 @@ export default function AddApartmentForm({
       title: "",
       address: "",
       price: "",
-      zone: "",
+      neighborhood: "",
       notes: "",
    });
    const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +185,12 @@ export default function AddApartmentForm({
          isValid: null,
          message: "",
       });
+   const [neighborhoodSuggestions, setNeighborhoodSuggestions] = useState<
+      string[]
+   >([]);
+   const [showSuggestions, setShowSuggestions] = useState(false);
    const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+   const neighborhoodInputRef = useRef<HTMLInputElement>(null);
 
    const validateAddress = async (address: string) => {
       if (!address.trim()) {
@@ -83,6 +242,27 @@ export default function AddApartmentForm({
       }
    };
 
+   const filterNeighborhoods = (query: string) => {
+      if (!query.trim()) {
+         setNeighborhoodSuggestions([]);
+         setShowSuggestions(false);
+         return;
+      }
+
+      const filtered = MADRID_NEIGHBORHOODS.filter((neighborhood) =>
+         neighborhood.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 8); // Mostrar máximo 8 sugerencias
+
+      setNeighborhoodSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+   };
+
+   const selectNeighborhood = (neighborhood: string) => {
+      setFormData((prev) => ({ ...prev, neighborhood }));
+      setShowSuggestions(false);
+      setNeighborhoodSuggestions([]);
+   };
+
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       setIsLoading(true);
@@ -98,7 +278,7 @@ export default function AddApartmentForm({
                title: formData.title || undefined,
                address: formData.address,
                price: parseInt(formData.price),
-               zone: formData.zone || undefined,
+               zone: formData.neighborhood || undefined,
                notes: formData.notes || undefined,
             }),
          });
@@ -113,7 +293,7 @@ export default function AddApartmentForm({
             title: "",
             address: "",
             price: "",
-            zone: "",
+            neighborhood: "",
             notes: "",
          });
          setAddressValidation({
@@ -160,6 +340,11 @@ export default function AddApartmentForm({
             validateAddress(value);
          }, 1200);
       }
+
+      // Filtrar barrios mientras se escribe
+      if (name === "neighborhood") {
+         filterNeighborhoods(value);
+      }
    };
 
    // Limpiar timeout al desmontar el componente
@@ -171,14 +356,31 @@ export default function AddApartmentForm({
       };
    }, []);
 
+   // Cerrar sugerencias al hacer clic fuera
+   useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+         if (
+            neighborhoodInputRef.current &&
+            !neighborhoodInputRef.current.contains(event.target as Node)
+         ) {
+            setShowSuggestions(false);
+         }
+      };
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+         document.removeEventListener("mousedown", handleClickOutside);
+      };
+   }, []);
+
    return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-         <h2 className="text-xl font-semibold mb-4 text-gray-800">
+      <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+         <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
             Añadir Nuevo Apartamento
          </h2>
 
          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+            <div className="bg-red-50 dark:bg-red-900/30 border border-red-300 dark:border-red-600 text-red-800 dark:text-red-200 px-4 py-3 rounded mb-4">
                {error}
             </div>
          )}
@@ -187,7 +389,7 @@ export default function AddApartmentForm({
             <div>
                <label
                   htmlFor="title"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
                >
                   Título (opcional)
                </label>
@@ -197,7 +399,7 @@ export default function AddApartmentForm({
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                   placeholder="Ej: Piso luminoso en el centro"
                />
             </div>
@@ -205,7 +407,7 @@ export default function AddApartmentForm({
             <div>
                <label
                   htmlFor="address"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
                >
                   Dirección *
                </label>
@@ -216,12 +418,12 @@ export default function AddApartmentForm({
                   value={formData.address}
                   onChange={handleChange}
                   required
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 ${
+                  className={`w-full px-3 py-2 bg-white dark:bg-gray-800 border rounded-md focus:outline-none focus:ring-2 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 ${
                      addressValidation.isValid === false
-                        ? "border-red-300"
+                        ? "border-red-400 dark:border-red-500 focus:ring-red-500 dark:focus:ring-red-400"
                         : addressValidation.isValid === true
-                        ? "border-green-300"
-                        : "border-gray-300"
+                        ? "border-green-400 dark:border-green-500 focus:ring-green-500 dark:focus:ring-green-400"
+                        : "border-gray-300 dark:border-gray-600 focus:ring-blue-500 dark:focus:ring-blue-400"
                   }`}
                   placeholder="Ej: Calle Gran Vía 1, Madrid"
                />
@@ -231,10 +433,10 @@ export default function AddApartmentForm({
                   <div
                      className={`mt-1 text-sm flex items-center ${
                         addressValidation.isValidating
-                           ? "text-blue-600"
+                           ? "text-blue-700 dark:text-blue-300"
                            : addressValidation.isValid
-                           ? "text-green-600"
-                           : "text-red-600"
+                           ? "text-green-700 dark:text-green-300"
+                           : "text-red-700 dark:text-red-300"
                      }`}
                   >
                      {addressValidation.isValidating && (
@@ -266,7 +468,7 @@ export default function AddApartmentForm({
             <div>
                <label
                   htmlFor="price"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
                >
                   Precio (€/mes) *
                </label>
@@ -278,33 +480,55 @@ export default function AddApartmentForm({
                   onChange={handleChange}
                   required
                   min="1"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                   placeholder="Ej: 1200"
                />
             </div>
 
-            <div>
+            <div className="relative" ref={neighborhoodInputRef}>
                <label
-                  htmlFor="zone"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  htmlFor="neighborhood"
+                  className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
                >
-                  Zona (opcional)
+                  Barrio (opcional)
                </label>
                <input
                   type="text"
-                  id="zone"
-                  name="zone"
-                  value={formData.zone}
+                  id="neighborhood"
+                  name="neighborhood"
+                  value={formData.neighborhood}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
-                  placeholder="Ej: Centro, Malasaña, Chueca"
+                  onFocus={() => {
+                     if (formData.neighborhood) {
+                        filterNeighborhoods(formData.neighborhood);
+                     }
+                  }}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                  placeholder="Escribe para buscar barrios de Madrid..."
+                  autoComplete="off"
                />
+
+               {/* Sugerencias de barrios */}
+               {showSuggestions && neighborhoodSuggestions.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                     {neighborhoodSuggestions.map((neighborhood, index) => (
+                        <button
+                           key={index}
+                           type="button"
+                           onClick={() => selectNeighborhood(neighborhood)}
+                           className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors duration-150 first:rounded-t-md last:rounded-b-md"
+                        >
+                           {neighborhood}
+                        </button>
+                     ))}
+                  </div>
+               )}
             </div>
 
             <div>
                <label
                   htmlFor="notes"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
                >
                   Notas (opcional)
                </label>
@@ -314,10 +538,10 @@ export default function AddApartmentForm({
                   rows={4}
                   value={formData.notes}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500 resize-vertical"
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 resize-vertical"
                   placeholder="Ej: Apartamento en excelente estado, muy luminoso, cerca del metro..."
                />
-               <p className="mt-1 text-xs text-gray-500">
+               <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
                   Añade cualquier información adicional sobre el apartamento
                </p>
             </div>
@@ -325,7 +549,7 @@ export default function AddApartmentForm({
             <button
                type="submit"
                disabled={isLoading}
-               className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+               className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 dark:bg-blue-500 dark:hover:bg-blue-600 dark:disabled:bg-blue-300 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
             >
                {isLoading ? "Añadiendo..." : "Añadir Apartamento"}
             </button>

@@ -12,7 +12,7 @@ import AuthButton from "./components/AuthButton";
 const MapView = dynamic(() => import("./components/MapView"), {
    ssr: false,
    loading: () => (
-      <div className="h-96 w-full bg-gray-200 rounded-lg flex items-center justify-center">
+      <div className="h-96 w-full bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center text-gray-600 dark:text-gray-300">
          Cargando mapa...
       </div>
    ),
@@ -89,17 +89,17 @@ export default function Home() {
 
    return (
       <AuthGuard>
-         <div className="min-h-screen bg-gray-50">
+         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
             <div className="container mx-auto px-4 py-8">
                <header className="text-center mb-8">
                   <div className="flex justify-between items-center mb-4">
                      <div></div>
                      <AuthButton />
                   </div>
-                  <h1 className="text-4xl font-bold text-gray-800 mb-2">
+                  <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                      Mapa de Apartamentos en Madrid
                   </h1>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 dark:text-gray-300">
                      Encuentra y añade apartamentos en alquiler en Madrid
                   </p>
                </header>
@@ -115,13 +115,13 @@ export default function Home() {
 
                   {/* Columna derecha: Mapa */}
                   <div className="lg:col-span-2">
-                     <div className="bg-white p-6 rounded-lg shadow-md">
+                     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                         <div className="flex justify-between items-center mb-4">
-                           <h2 className="text-xl font-semibold text-gray-800">
+                           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
                               Apartamentos ({apartments.length})
                            </h2>
                            {isLoading && (
-                              <span className="text-sm text-gray-500">
+                              <span className="text-sm text-gray-500 dark:text-gray-400">
                                  Cargando...
                               </span>
                            )}
@@ -130,7 +130,7 @@ export default function Home() {
                         <MapView apartments={apartments} />
 
                         {apartments.length === 0 && !isLoading && (
-                           <div className="text-center py-8 text-gray-500">
+                           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                               No se encontraron apartamentos con los filtros
                               actuales.
                            </div>

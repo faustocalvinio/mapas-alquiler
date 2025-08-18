@@ -95,7 +95,16 @@ export default function RootLayout({
       <html lang="es">
          <head>
             {/* PWA Meta Tags */}
-            <meta name="theme-color" content="#3b82f6" />
+            <meta
+               name="theme-color"
+               content="#3b82f6"
+               media="(prefers-color-scheme: light)"
+            />
+            <meta
+               name="theme-color"
+               content="#1e40af"
+               media="(prefers-color-scheme: dark)"
+            />
             <meta name="background-color" content="#ffffff" />
             <meta
                name="viewport"
@@ -117,6 +126,7 @@ export default function RootLayout({
                content="/icons/icon-144x144.png"
             />
             <meta name="msapplication-config" content="/browserconfig.xml" />
+          
          </head>
          <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}

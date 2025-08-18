@@ -44,15 +44,17 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
    };
 
    return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-         <h2 className="text-xl font-semibold mb-4 text-gray-800">Filtros</h2>
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+         <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
+            Filtros
+         </h2>
 
          <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                <div>
                   <label
                      htmlFor="minPrice"
-                     className="block text-sm font-medium text-gray-700 mb-1"
+                     className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
                   >
                      Precio mínimo (€)
                   </label>
@@ -63,7 +65,7 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
                      value={filters.minPrice}
                      onChange={handleChange}
                      min="0"
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                     className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                      placeholder="Ej: 500"
                   />
                </div>
@@ -71,7 +73,7 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
                <div>
                   <label
                      htmlFor="maxPrice"
-                     className="block text-sm font-medium text-gray-700 mb-1"
+                     className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
                   >
                      Precio máximo (€)
                   </label>
@@ -82,7 +84,7 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
                      value={filters.maxPrice}
                      onChange={handleChange}
                      min="0"
-                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                     className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                      placeholder="Ej: 2000"
                   />
                </div>
@@ -91,9 +93,9 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
             <div>
                <label
                   htmlFor="zone"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
                >
-                  Zona
+                  Barrio
                </label>
                <input
                   type="text"
@@ -101,14 +103,14 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
                   name="zone"
                   value={filters.zone}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
-                  placeholder="Ej: Centro, Malasaña, Chueca"
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                  placeholder="Ej: Malasaña, Chueca, La Latina"
                />
             </div>
 
             <button
                onClick={clearFilters}
-               className="w-full bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
+               className="w-full bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200"
             >
                Limpiar Filtros
             </button>
