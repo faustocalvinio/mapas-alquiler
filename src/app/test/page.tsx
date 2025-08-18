@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import AddApartmentForm from "./components/AddApartmentForm";
-import Filters from "./components/Filters";
-import ApartmentList from "./components/ApartmentList";
+import AddApartmentForm from "../components/AddApartmentForm";
+import Filters from "../components/Filters";
 
 // Importar MapView dinámicamente para evitar problemas de SSR con Leaflet
-const MapView = dynamic(() => import("./components/MapView"), {
+const MapView = dynamic(() => import("../components/MapView"), {
    ssr: false,
    loading: () => (
       <div className="h-96 w-full bg-gray-200 rounded-lg flex items-center justify-center">
@@ -22,7 +21,6 @@ interface Apartment {
    address: string;
    price: number;
    zone?: string;
-   notes?: string;
    lat: number;
    lng: number;
    createdAt: string;
@@ -77,10 +75,6 @@ export default function Home() {
       fetchApartments(currentFilters);
    };
 
-   const handleApartmentDeleted = () => {
-      fetchApartments(currentFilters);
-   };
-
    return (
       <div className="min-h-screen bg-gray-50">
          <div className="container mx-auto px-4 py-8">
@@ -104,7 +98,7 @@ export default function Home() {
                <div className="lg:col-span-2">
                   <div className="bg-white p-6 rounded-lg shadow-md">
                      <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold text-gray-800">
+                        <h2 className="text-xl font-semibold">
                            Apartamentos ({apartments.length})
                         </h2>
                         {isLoading && (
@@ -124,14 +118,6 @@ export default function Home() {
                      )}
                   </div>
                </div>
-            </div>
-
-            {/* Lista de apartamentos en ancho completo */}
-            <div className="mt-8">
-               <ApartmentList
-                  apartments={apartments}
-                  onApartmentDeleted={handleApartmentDeleted}
-               />
             </div>
          </div>
       </div>
