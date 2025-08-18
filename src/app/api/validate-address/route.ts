@@ -3,10 +3,30 @@ import { NextRequest, NextResponse } from 'next/server'
 // Función para geocoding usando Nominatim
 async function geocodeAddress(address: string): Promise<{ lat: number; lng: number; fullAddress: string } | null> {
     try {
-        const response = await fetch(
-            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address + ' Madrid')}&format=json&limit=1&addressdetails=1`
-        )
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address + ' Madrid')}&format=json&limit=1&addressdetails=1`
+        console.log('Realizando petición a Nominatim:', url)
+
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'MapasAlquiler/1.0 (contacto@mapasalquiler.com)' // Reemplaza con tu email
+            }
+        })
+
+        if (!response.ok) {
+            console.error('Error en respuesta de Nominatim:', response.status, response.statusText)
+            return null
+        }
+
+        const contentType = response.headers.get('content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+            console.error('Respuesta no es JSON:', contentType)
+            const text = await response.text()
+            console.error('Contenido de respuesta:', text.substring(0, 200))
+            return null
+        }
+
         const data = await response.json()
+        console.log('Datos recibidos de Nominatim:', data)
 
         if (data && data.length > 0) {
             const result = data[0]
