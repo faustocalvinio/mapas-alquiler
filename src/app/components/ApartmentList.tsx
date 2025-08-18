@@ -11,6 +11,12 @@ interface Apartment {
    notes?: string;
    lat: number;
    lng: number;
+   createdBy?: string;
+   userId?: string;
+   user?: {
+      name?: string;
+      email?: string;
+   };
    createdAt: string;
 }
 
@@ -311,9 +317,17 @@ export default function ApartmentList({
                               </div>
                            )}
 
-                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Agregado: {formatDate(apartment.createdAt)}
-                           </p>
+                           <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                              <p>Agregado: {formatDate(apartment.createdAt)}</p>
+                              {apartment.createdBy && (
+                                 <p>
+                                    Por:{" "}
+                                    <span className="font-medium text-blue-600 dark:text-blue-400">
+                                       {apartment.createdBy}
+                                    </span>
+                                 </p>
+                              )}
+                           </div>
                         </div>
 
                         <div className="ml-4 flex gap-2">

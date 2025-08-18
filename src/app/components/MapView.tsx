@@ -25,6 +25,12 @@ interface Apartment {
    notes?: string;
    lat: number;
    lng: number;
+   createdBy?: string;
+   userId?: string;
+   user?: {
+      name?: string;
+      email?: string;
+   };
    createdAt: string;
 }
 
@@ -79,6 +85,16 @@ export default function MapView({ apartments }: MapViewProps) {
                               </p>
                               <p className="text-sm text-gray-600 leading-relaxed">
                                  {apartment.notes}
+                              </p>
+                           </div>
+                        )}
+                        {apartment.createdBy && (
+                           <div className="mt-2 pt-2 border-t border-gray-200">
+                              <p className="text-xs text-gray-500">
+                                 Agregado por:{" "}
+                                 <span className="font-medium text-blue-600">
+                                    {apartment.createdBy}
+                                 </span>
                               </p>
                            </div>
                         )}

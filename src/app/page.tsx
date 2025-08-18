@@ -27,6 +27,12 @@ interface Apartment {
    notes?: string;
    lat: number;
    lng: number;
+   createdBy?: string;
+   userId?: string;
+   user?: {
+      name?: string;
+      email?: string;
+   };
    createdAt: string;
 }
 

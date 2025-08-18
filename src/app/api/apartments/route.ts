@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 // Función para geocoding usando Nominatim
 async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
@@ -61,7 +63,15 @@ export async function GET(request: NextRequest) {
 
         const apartments = await prisma.apartment.findMany({
             where: whereClause,
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        email: true
+                    }
+                }
+            }
         })
 
         return NextResponse.json(apartments)
@@ -76,6 +86,16 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
+        // Obtener sesión del usuario
+        const session = await getServerSession(authOptions)
+
+        if (!session?.user) {
+            return NextResponse.json(
+                { error: 'No autorizado' },
+                { status: 401 }
+            )
+        }
+
         const body = await request.json()
         const { address, price, zone, title, notes } = body
 
@@ -103,6 +123,9 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        // Extraer el primer nombre del usuario
+        const firstName = session.user.name?.split(' ')[0] || session.user.email?.split('@')[0] || 'Usuario'
+
         // Crear apartamento
         const apartment = await prisma.apartment.create({
             data: {
@@ -112,7 +135,9 @@ export async function POST(request: NextRequest) {
                 zone: zone || null,
                 notes: notes || null,
                 lat: coordinates.lat,
-                lng: coordinates.lng
+                lng: coordinates.lng,
+                createdBy: firstName,
+                userId: session.user.id
             }
         })
 
