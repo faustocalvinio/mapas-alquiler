@@ -158,7 +158,7 @@ export default function AddApartmentForm({
          // Establecer nuevo timeout
          validationTimeoutRef.current = setTimeout(() => {
             validateAddress(value);
-         }, 3000);
+         }, 1200);
       }
    };
 

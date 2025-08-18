@@ -5,6 +5,8 @@ import dynamic from "next/dynamic";
 import AddApartmentForm from "./components/AddApartmentForm";
 import Filters from "./components/Filters";
 import ApartmentList from "./components/ApartmentList";
+import AuthGuard from "./components/AuthGuard";
+import AuthButton from "./components/AuthButton";
 
 // Importar MapView dinámicamente para evitar problemas de SSR con Leaflet
 const MapView = dynamic(() => import("./components/MapView"), {
@@ -86,59 +88,67 @@ export default function Home() {
    };
 
    return (
-      <div className="min-h-screen bg-gray-50">
-         <div className="container mx-auto px-4 py-8">
-            <header className="text-center mb-8">
-               <h1 className="text-4xl font-bold text-gray-800 mb-2">
-                  Mapa de Apartamentos en Madrid
-               </h1>
-               <p className="text-gray-600">
-                  Encuentra y añade apartamentos en alquiler en Madrid
-               </p>
-            </header>
+      <AuthGuard>
+         <div className="min-h-screen bg-gray-50">
+            <div className="container mx-auto px-4 py-8">
+               <header className="text-center mb-8">
+                  <div className="flex justify-between items-center mb-4">
+                     <div></div>
+                     <AuthButton />
+                  </div>
+                  <h1 className="text-4xl font-bold text-gray-800 mb-2">
+                     Mapa de Apartamentos en Madrid
+                  </h1>
+                  <p className="text-gray-600">
+                     Encuentra y añade apartamentos en alquiler en Madrid
+                  </p>
+               </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-               {/* Columna izquierda: Formulario y filtros */}
-               <div className="lg:col-span-1 space-y-6">
-                  <AddApartmentForm onApartmentAdded={handleApartmentAdded} />
-                  <Filters onFiltersChange={handleFiltersChange} />
-               </div>
+               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  {/* Columna izquierda: Formulario y filtros */}
+                  <div className="lg:col-span-1 space-y-6">
+                     <AddApartmentForm
+                        onApartmentAdded={handleApartmentAdded}
+                     />
+                     <Filters onFiltersChange={handleFiltersChange} />
+                  </div>
 
-               {/* Columna derecha: Mapa */}
-               <div className="lg:col-span-2">
-                  <div className="bg-white p-6 rounded-lg shadow-md">
-                     <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-semibold text-gray-800">
-                           Apartamentos ({apartments.length})
-                        </h2>
-                        {isLoading && (
-                           <span className="text-sm text-gray-500">
-                              Cargando...
-                           </span>
+                  {/* Columna derecha: Mapa */}
+                  <div className="lg:col-span-2">
+                     <div className="bg-white p-6 rounded-lg shadow-md">
+                        <div className="flex justify-between items-center mb-4">
+                           <h2 className="text-xl font-semibold text-gray-800">
+                              Apartamentos ({apartments.length})
+                           </h2>
+                           {isLoading && (
+                              <span className="text-sm text-gray-500">
+                                 Cargando...
+                              </span>
+                           )}
+                        </div>
+
+                        <MapView apartments={apartments} />
+
+                        {apartments.length === 0 && !isLoading && (
+                           <div className="text-center py-8 text-gray-500">
+                              No se encontraron apartamentos con los filtros
+                              actuales.
+                           </div>
                         )}
                      </div>
-
-                     <MapView apartments={apartments} />
-
-                     {apartments.length === 0 && !isLoading && (
-                        <div className="text-center py-8 text-gray-500">
-                           No se encontraron apartamentos con los filtros
-                           actuales.
-                        </div>
-                     )}
                   </div>
                </div>
-            </div>
 
-            {/* Lista de apartamentos en ancho completo */}
-            <div className="mt-8">
-               <ApartmentList
-                  apartments={apartments}
-                  onApartmentDeleted={handleApartmentDeleted}
-                  onApartmentUpdated={handleApartmentUpdated}
-               />
+               {/* Lista de apartamentos en ancho completo */}
+               <div className="mt-8">
+                  <ApartmentList
+                     apartments={apartments}
+                     onApartmentDeleted={handleApartmentDeleted}
+                     onApartmentUpdated={handleApartmentUpdated}
+                  />
+               </div>
             </div>
          </div>
-      </div>
+      </AuthGuard>
    );
 }
