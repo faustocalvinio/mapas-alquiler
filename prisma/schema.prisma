@@ -49,6 +49,7 @@ model User {
   isAuthorized  Boolean   @default(false)
   accounts      Account[]
   sessions      Session[]
+  apartments    Apartment[]
 }
 
 model VerificationToken {
@@ -68,5 +69,8 @@ model Apartment {
   notes     String?
   lat       Float
   lng       Float
+  createdBy String?  // Primer nombre del usuario que lo agregó
+  userId    String?  // ID del usuario para la relación
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
 }
