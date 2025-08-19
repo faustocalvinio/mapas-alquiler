@@ -554,8 +554,8 @@ export default function AddApartmentForm({
                </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <div>
+            <div className="flex flex-row flex-wrap gap-4 ">
+               <div className="">
                   <label
                      htmlFor="status"
                      className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
