@@ -97,7 +97,9 @@ export default function MapaLibre() {
                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
                      }`}
                   >
-                     {isDrawingMode ? "🎯 Modo Selección" : "✏️ Activar Selección"}
+                     {isDrawingMode
+                        ? "🎯 Modo Selección"
+                        : "✏️ Activar Selección"}
                   </button>
 
                   <button
@@ -108,7 +110,9 @@ export default function MapaLibre() {
                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
                      }`}
                   >
-                     {showApartments ? "🏠 Ocultar Apartamentos" : "🏠 Mostrar Apartamentos"}
+                     {showApartments
+                        ? "🏠 Ocultar Apartamentos"
+                        : "🏠 Mostrar Apartamentos"}
                   </button>
                </div>
 
@@ -152,7 +156,10 @@ export default function MapaLibre() {
                </h3>
                <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
                   <li>• Dibuja un rectángulo para seleccionar una zona</li>
-                  <li>• Haz clic en "Descargar Selección" cuando termines</li>
+                  <li>
+                     • Haz clic en &quot;Descargar Selección&quot; cuando
+                     termines
+                  </li>
                   <li>• Usa las herramientas del mapa para dibujar formas</li>
                   <li>• Presiona ESC para cancelar el dibujo</li>
                </ul>
