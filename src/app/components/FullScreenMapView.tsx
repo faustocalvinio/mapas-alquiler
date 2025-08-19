@@ -24,28 +24,28 @@ const createCustomIcon = (color: string, status: string) => {
       html: `
          <div style="
             background-color: ${color};
-            width: 25px;
-            height: 25px;
+            width: 30px;
+            height: 30px;
             border-radius: 50% 50% 50% 0;
-            border: 2px solid white;
+            border: 3px solid white;
             transform: rotate(-45deg);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4);
          ">
             <span style="
                transform: rotate(45deg);
-               font-size: 10px;
+               font-size: 12px;
                color: white;
-               text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+               text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
             ">${statusIcon}</span>
          </div>
       `,
-      className: "custom-marker",
-      iconSize: [25, 25],
-      iconAnchor: [12, 25],
-      popupAnchor: [0, -25],
+      className: "custom-marker-fullscreen",
+      iconSize: [30, 30],
+      iconAnchor: [15, 30],
+      popupAnchor: [0, -30],
    });
 };
 
@@ -69,18 +69,20 @@ interface Apartment {
    createdAt: string;
 }
 
-interface MapViewProps {
+interface FullScreenMapViewProps {
    apartments: Apartment[];
 }
 
-export default function MapView({ apartments }: MapViewProps) {
+export default function FullScreenMapView({
+   apartments,
+}: FullScreenMapViewProps) {
    const mapRef = useRef<L.Map | null>(null);
 
    // Coordenadas de Madrid
    const madridCenter: [number, number] = [40.4168, -3.7038];
 
    return (
-      <div className="relative h-[900px] w-full rounded-lg overflow-hidden border border-gray-300">
+      <div className="h-full w-full">
          <MapContainer
             center={madridCenter}
             zoom={11}
@@ -99,8 +101,8 @@ export default function MapView({ apartments }: MapViewProps) {
                   icon={createCustomIcon(apartment.iconColor, apartment.status)}
                >
                   <Popup>
-                     <div className="p-2 min-w-48 max-w-64">
-                        <div className="flex items-center justify-between mb-2">
+                     <div className="p-3 min-w-60 max-w-80">
+                        <div className="flex items-center justify-between mb-3">
                            <h3 className="font-semibold text-lg">
                               {apartment.title || "Apartamento"}
                            </h3>
@@ -116,21 +118,21 @@ export default function MapView({ apartments }: MapViewProps) {
                                  : "🟢 Disponible"}
                            </span>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">
-                           {apartment.address}
+                        <p className="text-sm text-gray-600 mb-3">
+                           📍 {apartment.address}
                         </p>
-                        <p className="text-lg font-bold text-blue-600 mb-2">
-                           {apartment.price}€/mes
+                        <p className="text-xl font-bold text-blue-600 mb-3">
+                           💰 {apartment.price}€/mes
                         </p>
                         {apartment.zone && (
                            <p className="text-sm text-gray-500 mb-2">
-                              Zona: {apartment.zone}
+                              🏘️ Zona: {apartment.zone}
                            </p>
                         )}
                         {apartment.notes && (
-                           <div className="mt-2 pt-2 border-t border-gray-200">
+                           <div className="mt-3 pt-3 border-t border-gray-200">
                               <p className="text-xs font-medium text-gray-700 mb-1">
-                                 Notas:
+                                 📝 Notas:
                               </p>
                               <p className="text-sm text-gray-600 leading-relaxed">
                                  {apartment.notes}
@@ -138,15 +140,23 @@ export default function MapView({ apartments }: MapViewProps) {
                            </div>
                         )}
                         {apartment.createdBy && (
-                           <div className="mt-2 pt-2 border-t border-gray-200">
+                           <div className="mt-3 pt-3 border-t border-gray-200">
                               <p className="text-xs text-gray-500">
-                                 Agregado por:{" "}
+                                 👤 Agregado por:{" "}
                                  <span className="font-medium text-blue-600">
                                     {apartment.createdBy}
                                  </span>
                               </p>
                            </div>
                         )}
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                           <p className="text-xs text-gray-400">
+                              📅{" "}
+                              {new Date(apartment.createdAt).toLocaleDateString(
+                                 "es-ES"
+                              )}
+                           </p>
+                        </div>
                      </div>
                   </Popup>
                </Marker>

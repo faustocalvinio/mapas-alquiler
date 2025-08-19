@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import AddApartmentForm from "./components/AddApartmentForm";
 import Filters from "./components/Filters";
 import ApartmentList from "./components/ApartmentList";
@@ -27,6 +28,8 @@ interface Apartment {
    notes?: string;
    lat: number;
    lng: number;
+   status: string;
+   iconColor: string;
    createdBy?: string;
    userId?: string;
    user?: {
@@ -43,10 +46,16 @@ export default function Home() {
       minPrice?: number;
       maxPrice?: number;
       zone?: string;
+      status?: string;
    }>({});
 
    const fetchApartments = async (
-      filters: { minPrice?: number; maxPrice?: number; zone?: string } = {}
+      filters: {
+         minPrice?: number;
+         maxPrice?: number;
+         zone?: string;
+         status?: string;
+      } = {}
    ) => {
       try {
          const params = new URLSearchParams();
@@ -55,6 +64,7 @@ export default function Home() {
          if (filters.maxPrice)
             params.append("maxPrice", filters.maxPrice.toString());
          if (filters.zone) params.append("zone", filters.zone);
+         if (filters.status) params.append("status", filters.status);
 
          const response = await fetch(`/api/apartments?${params}`);
          if (!response.ok) throw new Error("Error al cargar apartamentos");
@@ -76,6 +86,7 @@ export default function Home() {
       minPrice?: number;
       maxPrice?: number;
       zone?: string;
+      status?: string;
    }) => {
       setCurrentFilters(filters);
       fetchApartments(filters);
@@ -126,11 +137,19 @@ export default function Home() {
                            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
                               Apartamentos ({apartments.length})
                            </h2>
-                           {isLoading && (
-                              <span className="text-sm text-gray-500 dark:text-gray-400">
-                                 Cargando...
-                              </span>
-                           )}
+                           <div className="flex items-center space-x-3">
+                              <Link
+                                 href="/fullscreen"
+                                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-md transition-colors"
+                              >
+                                 🔍 Vista completa
+                              </Link>
+                              {isLoading && (
+                                 <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Cargando...
+                                 </span>
+                              )}
+                           </div>
                         </div>
 
                         <MapView apartments={apartments} />

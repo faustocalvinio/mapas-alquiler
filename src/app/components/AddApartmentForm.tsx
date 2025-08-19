@@ -176,6 +176,8 @@ export default function AddApartmentForm({
       price: "",
       neighborhood: "",
       notes: "",
+      status: "available",
+      iconColor: "#3B82F6",
    });
    const [isLoading, setIsLoading] = useState(false);
    const [error, setError] = useState("");
@@ -280,6 +282,8 @@ export default function AddApartmentForm({
                price: parseInt(formData.price),
                zone: formData.neighborhood || undefined,
                notes: formData.notes || undefined,
+               status: formData.status,
+               iconColor: formData.iconColor,
             }),
          });
 
@@ -295,6 +299,8 @@ export default function AddApartmentForm({
             price: "",
             neighborhood: "",
             notes: "",
+            status: "available",
+            iconColor: "#3B82F6",
          });
          setAddressValidation({
             isValidating: false,
@@ -310,7 +316,9 @@ export default function AddApartmentForm({
    };
 
    const handleChange = (
-      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+      e: React.ChangeEvent<
+         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >
    ) => {
       const { name, value } = e.target;
       setFormData((prev) => ({
@@ -544,6 +552,63 @@ export default function AddApartmentForm({
                <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
                   Añade cualquier información adicional sobre el apartamento
                </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <div>
+                  <label
+                     htmlFor="status"
+                     className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+                  >
+                     Estado
+                  </label>
+                  <select
+                     id="status"
+                     name="status"
+                     value={formData.status}
+                     onChange={handleChange}
+                     className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
+                  >
+                     <option value="available">🟢 Disponible</option>
+                     <option value="rented">🔴 Alquilado</option>
+                  </select>
+               </div>
+
+               <div>
+                  <label
+                     htmlFor="iconColor"
+                     className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+                  >
+                     Color del icono
+                  </label>
+                  <div className="flex items-center space-x-2">
+                     <input
+                        type="color"
+                        id="iconColor"
+                        name="iconColor"
+                        value={formData.iconColor}
+                        onChange={handleChange}
+                        className="w-12 h-9 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
+                        title="Seleccionar color del icono"
+                     />
+                     <input
+                        type="text"
+                        value={formData.iconColor}
+                        onChange={(e) =>
+                           setFormData((prev) => ({
+                              ...prev,
+                              iconColor: e.target.value,
+                           }))
+                        }
+                        className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 text-sm"
+                        placeholder="#3B82F6"
+                        pattern="^#[0-9A-Fa-f]{6}$"
+                     />
+                  </div>
+                  <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                     Color que aparecerá en el mapa para este apartamento
+                  </p>
+               </div>
             </div>
 
             <button

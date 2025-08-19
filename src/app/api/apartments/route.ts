@@ -50,6 +50,7 @@ export async function GET(request: NextRequest) {
         const minPrice = searchParams.get('minPrice')
         const maxPrice = searchParams.get('maxPrice')
         const zone = searchParams.get('zone')
+        const status = searchParams.get('status')
 
         const whereClause: Record<string, unknown> = {}
 
@@ -60,6 +61,7 @@ export async function GET(request: NextRequest) {
             whereClause.price = priceFilter
         }
         if (zone) whereClause.zone = { contains: zone, mode: 'insensitive' }
+        if (status) whereClause.status = status
 
         const apartments = await prisma.apartment.findMany({
             where: whereClause,
@@ -97,7 +99,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json()
-        const { address, price, zone, title, notes } = body
+        const { address, price, zone, title, notes, status, iconColor } = body
 
         // Validación
         if (!address || !price) {
@@ -110,6 +112,22 @@ export async function POST(request: NextRequest) {
         if (price <= 0) {
             return NextResponse.json(
                 { error: 'El precio debe ser mayor a 0' },
+                { status: 400 }
+            )
+        }
+
+        // Validar estado
+        if (status && !['available', 'rented'].includes(status)) {
+            return NextResponse.json(
+                { error: 'El estado debe ser "available" o "rented"' },
+                { status: 400 }
+            )
+        }
+
+        // Validar color (formato hex)
+        if (iconColor && !/^#[0-9A-F]{6}$/i.test(iconColor)) {
+            return NextResponse.json(
+                { error: 'El color debe estar en formato hexadecimal (ej: #FF5733)' },
                 { status: 400 }
             )
         }
@@ -134,6 +152,8 @@ export async function POST(request: NextRequest) {
                 price: parseInt(price),
                 zone: zone || null,
                 notes: notes || null,
+                status: status || 'available',
+                iconColor: iconColor || '#3B82F6',
                 lat: coordinates.lat,
                 lng: coordinates.lng,
                 createdBy: firstName,
@@ -190,7 +210,7 @@ export async function PUT(request: NextRequest) {
         }
 
         const body = await request.json()
-        const { address, price, zone, title, notes } = body
+        const { address, price, zone, title, notes, status, iconColor } = body
 
         // Validación
         if (!address || !price) {
@@ -203,6 +223,22 @@ export async function PUT(request: NextRequest) {
         if (price <= 0) {
             return NextResponse.json(
                 { error: 'El precio debe ser mayor a 0' },
+                { status: 400 }
+            )
+        }
+
+        // Validar estado
+        if (status && !['available', 'rented'].includes(status)) {
+            return NextResponse.json(
+                { error: 'El estado debe ser "available" o "rented"' },
+                { status: 400 }
+            )
+        }
+
+        // Validar color (formato hex)
+        if (iconColor && !/^#[0-9A-F]{6}$/i.test(iconColor)) {
+            return NextResponse.json(
+                { error: 'El color debe estar en formato hexadecimal (ej: #FF5733)' },
                 { status: 400 }
             )
         }
@@ -241,6 +277,8 @@ export async function PUT(request: NextRequest) {
                 price: parseInt(price),
                 zone: zone || null,
                 notes: notes || null,
+                status: status || 'available',
+                iconColor: iconColor || '#3B82F6',
                 lat: coordinates.lat,
                 lng: coordinates.lng
             }

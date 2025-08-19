@@ -69,6 +69,8 @@ model Apartment {
   notes     String?
   lat       Float
   lng       Float
+  status    String   @default("available") // "available" o "rented"
+  iconColor String   @default("#3B82F6") // Color del icono en hex
   createdBy String?  // Primer nombre del usuario que lo agregó
   userId    String?  // ID del usuario para la relación
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)

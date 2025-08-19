@@ -7,6 +7,7 @@ interface FiltersProps {
       minPrice?: number;
       maxPrice?: number;
       zone?: string;
+      status?: string;
    }) => void;
 }
 
@@ -15,9 +16,12 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
       minPrice: "",
       maxPrice: "",
       zone: "",
+      status: "",
    });
 
-   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+   const handleChange = (
+      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+   ) => {
       const { name, value } = e.target;
       const newFilters = { ...filters, [name]: value };
       setFilters(newFilters);
@@ -27,6 +31,7 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
          minPrice?: number;
          maxPrice?: number;
          zone?: string;
+         status?: string;
       } = {};
 
       if (newFilters.minPrice)
@@ -34,12 +39,13 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
       if (newFilters.maxPrice)
          filtersToApply.maxPrice = parseInt(newFilters.maxPrice);
       if (newFilters.zone) filtersToApply.zone = newFilters.zone;
+      if (newFilters.status) filtersToApply.status = newFilters.status;
 
       onFiltersChange(filtersToApply);
    };
 
    const clearFilters = () => {
-      setFilters({ minPrice: "", maxPrice: "", zone: "" });
+      setFilters({ minPrice: "", maxPrice: "", zone: "", status: "" });
       onFiltersChange({});
    };
 
@@ -106,6 +112,26 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
                   className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                   placeholder="Ej: Malasaña, Chueca, La Latina"
                />
+            </div>
+
+            <div>
+               <label
+                  htmlFor="status"
+                  className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+               >
+                  Estado
+               </label>
+               <select
+                  id="status"
+                  name="status"
+                  value={filters.status}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
+               >
+                  <option value="">Todos los estados</option>
+                  <option value="available">🟢 Solo disponibles</option>
+                  <option value="rented">🔴 Solo alquilados</option>
+               </select>
             </div>
 
             <button
