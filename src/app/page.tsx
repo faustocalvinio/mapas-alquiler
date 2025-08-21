@@ -113,7 +113,6 @@ export default function Home() {
                      <div></div>
                      <AuthButton />
                   </div>
-                 
                </header>
 
                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -133,6 +132,18 @@ export default function Home() {
                               Apartamentos ({apartments.length})
                            </h2>
                            <div className="flex items-center space-x-3">
+                              <Link
+                                 href="/metro-mapa"
+                                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 rounded-md transition-colors"
+                              >
+                                 🚇 Metro Madrid
+                              </Link>
+                              <Link
+                                 href="/mapa-libre"
+                                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-md transition-colors"
+                              >
+                                 ✏️ Mapa Interactivo
+                              </Link>
                               <Link
                                  href="/fullscreen"
                                  className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-md transition-colors"
