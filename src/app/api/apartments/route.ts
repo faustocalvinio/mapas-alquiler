@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json()
-        const { address, price, zone, title, notes, status, iconColor } = body
+        const { address, price, zone, title, notes, link, status, iconColor } = body
 
         // Validación
         if (!address || !price) {
@@ -152,6 +152,7 @@ export async function POST(request: NextRequest) {
                 price: parseInt(price),
                 zone: zone || null,
                 notes: notes || null,
+                link: link || null,
                 status: status || 'available',
                 iconColor: iconColor || '#3B82F6',
                 lat: coordinates.lat,
@@ -210,7 +211,7 @@ export async function PUT(request: NextRequest) {
         }
 
         const body = await request.json()
-        const { address, price, zone, title, notes, status, iconColor } = body
+        const { address, price, zone, title, notes, link, status, iconColor } = body
 
         // Validación
         if (!address || !price) {
@@ -277,6 +278,7 @@ export async function PUT(request: NextRequest) {
                 price: parseInt(price),
                 zone: zone || null,
                 notes: notes || null,
+                link: link || null,
                 status: status || 'available',
                 iconColor: iconColor || '#3B82F6',
                 lat: coordinates.lat,

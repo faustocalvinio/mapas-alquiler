@@ -67,6 +67,7 @@ model Apartment {
   price     Int
   zone      String?
   notes     String?
+  link      String?  // Link adicional del apartamento
   lat       Float
   lng       Float
   status    String   @default("available") // "available" o "rented"

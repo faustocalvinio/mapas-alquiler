@@ -9,6 +9,7 @@ interface Apartment {
    price: number;
    zone?: string;
    notes?: string;
+   link?: string;
    lat: number;
    lng: number;
    status: string;
@@ -41,6 +42,7 @@ export default function ApartmentList({
       price: "",
       zone: "",
       notes: "",
+      link: "",
       status: "",
       iconColor: "",
    });
@@ -141,6 +143,7 @@ export default function ApartmentList({
          price: apartment.price.toString(),
          zone: apartment.zone || "",
          notes: apartment.notes || "",
+         link: apartment.link || "",
          status: apartment.status || "available",
          iconColor: apartment.iconColor || "#3B82F6",
       });
@@ -160,6 +163,7 @@ export default function ApartmentList({
          price: "",
          zone: "",
          notes: "",
+         link: "",
          status: "",
          iconColor: "",
       });
@@ -236,6 +240,7 @@ export default function ApartmentList({
                price: parseInt(formData.price),
                zone: formData.zone.trim() || null,
                notes: formData.notes.trim() || null,
+               link: formData.link.trim() || null,
                status: formData.status || "available",
                iconColor: formData.iconColor || "#3B82F6",
             }),
@@ -349,6 +354,35 @@ export default function ApartmentList({
                                  <p className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-2 rounded">
                                     {apartment.notes}
                                  </p>
+                              </div>
+                           )}
+
+                           {apartment.link && (
+                              <div className="mb-2">
+                                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Enlace:
+                                 </p>
+                                 <a
+                                    href={apartment.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline break-all"
+                                 >
+                                    <svg
+                                       className="w-4 h-4 flex-shrink-0"
+                                       fill="none"
+                                       stroke="currentColor"
+                                       viewBox="0 0 24 24"
+                                    >
+                                       <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M14 4h6m0 0v6m0-6L10 14"
+                                       />
+                                    </svg>
+                                    {apartment.link}
+                                 </a>
                               </div>
                            )}
 
@@ -614,6 +648,24 @@ export default function ApartmentList({
                                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 resize-none"
                                  placeholder="Información adicional sobre el apartamento..."
                               />
+                           </div>
+
+                           <div>
+                              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                 Link (opcional)
+                              </label>
+                              <input
+                                 type="url"
+                                 name="link"
+                                 value={formData.link}
+                                 onChange={handleInputChange}
+                                 className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
+                                 placeholder="https://ejemplo.com/anuncio-apartamento"
+                              />
+                              <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                                 URL del anuncio original o página con más
+                                 información
+                              </p>
                            </div>
 
                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

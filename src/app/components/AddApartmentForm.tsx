@@ -176,6 +176,7 @@ export default function AddApartmentForm({
       price: "",
       neighborhood: "",
       notes: "",
+      link: "",
       status: "available",
       iconColor: "#3B82F6",
    });
@@ -282,6 +283,7 @@ export default function AddApartmentForm({
                price: parseInt(formData.price),
                zone: formData.neighborhood || undefined,
                notes: formData.notes || undefined,
+               link: formData.link || undefined,
                status: formData.status,
                iconColor: formData.iconColor,
             }),
@@ -299,6 +301,7 @@ export default function AddApartmentForm({
             price: "",
             neighborhood: "",
             notes: "",
+            link: "",
             status: "available",
             iconColor: "#3B82F6",
          });
@@ -551,6 +554,27 @@ export default function AddApartmentForm({
                />
                <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
                   Añade cualquier información adicional sobre el apartamento
+               </p>
+            </div>
+
+            <div>
+               <label
+                  htmlFor="link"
+                  className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+               >
+                  Link (opcional)
+               </label>
+               <input
+                  type="url"
+                  id="link"
+                  name="link"
+                  value={formData.link}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                  placeholder="https://ejemplo.com/anuncio-apartamento"
+               />
+               <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                  URL del anuncio original o página con más información
                </p>
             </div>
 
