@@ -61,6 +61,8 @@ export const metadata: Metadata = {
    },
    icons: {
       icon: [
+         { url: "/favicon.ico", sizes: "any" },
+         { url: "/favicon.png", sizes: "32x32", type: "image/png" },
          {
             url: "/icons/icon-192x192.png",
             sizes: "192x192",
@@ -75,7 +77,7 @@ export const metadata: Metadata = {
       apple: [
          { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
       ],
-      shortcut: "/favicon.png",
+      shortcut: "/favicon.ico",
    },
    manifest: "/manifest.json",
    appleWebApp: {
@@ -94,6 +96,11 @@ export default function RootLayout({
    return (
       <html lang="es">
          <head>
+            {/* Favicon */}
+            <link rel="icon" href="/favicon.ico" sizes="any" />
+            <link rel="icon" href="/favicon.png" type="image/png" />
+            <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
             {/* PWA Meta Tags */}
             <meta
                name="theme-color"
@@ -126,7 +133,6 @@ export default function RootLayout({
                content="/icons/icon-144x144.png"
             />
             <meta name="msapplication-config" content="/browserconfig.xml" />
-          
          </head>
          <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
