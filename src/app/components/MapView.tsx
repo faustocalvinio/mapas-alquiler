@@ -80,7 +80,7 @@ export default function MapView({ apartments }: MapViewProps) {
    const madridCenter: [number, number] = [40.4168, -3.7038];
 
    return (
-      <div className="relative h-[900px] w-full rounded-lg overflow-hidden border border-gray-300">
+      <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] w-full rounded-lg overflow-hidden border border-gray-300">
          <MapContainer
             center={madridCenter}
             zoom={11}

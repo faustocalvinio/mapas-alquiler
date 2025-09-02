@@ -107,17 +107,17 @@ export default function Home() {
    return (
       <AuthGuard>
          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-            <div className="container mx-auto px-4 py-8">
-               <header className="text-center mb-8">
+            <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+               <header className="text-center mb-6 sm:mb-8">
                   <div className="flex justify-between items-center mb-4">
                      <div></div>
                      <AuthButton />
                   </div>
                </header>
 
-               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                   {/* Columna izquierda: Formulario y filtros */}
-                  <div className="lg:col-span-1 space-y-6">
+                  <div className="lg:col-span-1 space-y-4 lg:space-y-6">
                      <AddApartmentForm
                         onApartmentAdded={handleApartmentAdded}
                      />
@@ -126,38 +126,38 @@ export default function Home() {
 
                   {/* Columna derecha: Mapa */}
                   <div className="lg:col-span-2">
-                     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <div className="flex justify-between items-center mb-4">
+                     <div className="bg-white dark:bg-gray-800 p-4 lg:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3 sm:gap-0">
                            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
                               Apartamentos ({apartments.length})
                            </h2>
-                           <div className="flex items-center space-x-3">
+                           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                               <Link
                                  href="/metro-mapa"
-                                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 rounded-md transition-colors"
+                                 className="inline-flex items-center px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 rounded-md transition-colors"
                               >
-                                 🚇 Metro Madrid
+                                 🚇 Metro
                               </Link>
                               <Link
                                  href="/mapa-libre"
-                                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-md transition-colors"
+                                 className="inline-flex items-center px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-md transition-colors"
                               >
-                                 ✏️ Mapa Interactivo
+                                 ✏️{" "}
+                                 <span className="hidden sm:inline ml-1">
+                                    Interactivo
+                                 </span>
                               </Link>
                               <Link
                                  href="/fullscreen"
-                                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-md transition-colors"
+                                 className="inline-flex items-center px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 rounded-md transition-colors"
                               >
-                                 🔍 Vista completa
-                              </Link>
-                              <Link
-                                 href="/mapa-libre"
-                                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900 hover:bg-green-200 dark:hover:bg-green-800 rounded-md transition-colors"
-                              >
-                                 📸 Mapa Interactivo
+                                 🔍{" "}
+                                 <span className="hidden sm:inline ml-1">
+                                    Completa
+                                 </span>
                               </Link>
                               {isLoading && (
-                                 <span className="text-sm text-gray-500 dark:text-gray-400">
+                                 <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                                     Cargando...
                                  </span>
                               )}
@@ -167,9 +167,11 @@ export default function Home() {
                         <MapView apartments={apartments} />
 
                         {apartments.length === 0 && !isLoading && (
-                           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                              No se encontraron apartamentos con los filtros
-                              actuales.
+                           <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400">
+                              <p className="text-sm sm:text-base">
+                                 No se encontraron apartamentos con los filtros
+                                 actuales.
+                              </p>
                            </div>
                         )}
                      </div>
@@ -177,7 +179,7 @@ export default function Home() {
                </div>
 
                {/* Lista de apartamentos en ancho completo */}
-               <div className="mt-8">
+               <div className="mt-6 sm:mt-8">
                   <ApartmentList
                      apartments={apartments}
                      onApartmentDeleted={handleApartmentDeleted}
