@@ -26,6 +26,7 @@ interface Apartment {
    price: number;
    zone?: string;
    notes?: string;
+   link?: string;
    lat: number;
    lng: number;
    status: string;

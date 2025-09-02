@@ -22,6 +22,7 @@ interface Apartment {
    price: number;
    zone?: string;
    notes?: string;
+   link?: string;
    lat: number;
    lng: number;
    status: string;
@@ -239,6 +240,11 @@ export default function SelectableMapView({
                ${
                   apartment.notes
                      ? `<p style="margin: 4px 0; font-size: 12px;"><strong>📝 Notas:</strong> ${apartment.notes}</p>`
+                     : ""
+               }
+               ${
+                  apartment.link
+                     ? `<p style="margin: 4px 0; font-size: 12px;"><strong>🔗 Link:</strong> <a href="${apartment.link}" target="_blank" rel="noopener noreferrer" style="color: #3B82F6; text-decoration: underline;">${apartment.link}</a></p>`
                      : ""
                }
             </div>
