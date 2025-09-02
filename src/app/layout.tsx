@@ -30,14 +30,14 @@ export const metadata: Metadata = {
       address: false,
       telephone: false,
    },
-   metadataBase: new URL("https://tu-dominio.com"), // Cambia por tu dominio
+   metadataBase: new URL("https://mapa.facal.space/"), // Cambia por tu dominio
    alternates: {
       canonical: "/",
    },
    openGraph: {
       type: "website",
       locale: "es_ES",
-      url: "https://tu-dominio.com", // Cambia por tu dominio
+      url: "https://mapa.facal.space/", // Cambia por tu dominio
       siteName: "Mapas Alquiler",
       title: "Mapas Alquiler - Apartamentos en Madrid",
       description:
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
       apple: [
          { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
       ],
-      shortcut: "/favicon.ico",
+      shortcut: "/favicon.png",
    },
    manifest: "/manifest.json",
    appleWebApp: {
