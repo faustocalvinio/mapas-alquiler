@@ -49,6 +49,43 @@ const createCustomIcon = (color: string, status: string) => {
    });
 };
 
+// Función para crear iconos de ubicaciones personalizadas
+const createLocationIcon = (color: string, type: string) => {
+   const typeIcons: { [key: string]: string } = {
+      work: "💼",
+      metro: "🚇",
+      poi: "📍",
+      other: "📌",
+   };
+
+   const icon = typeIcons[type] || "📌";
+
+   return L.divIcon({
+      html: `
+         <div style="
+            background-color: ${color};
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+         ">
+            <span style="
+               font-size: 14px;
+               filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.5));
+            ">${icon}</span>
+         </div>
+      `,
+      className: "custom-location-marker",
+      iconSize: [30, 30],
+      iconAnchor: [15, 15],
+      popupAnchor: [0, -15],
+   });
+};
+
 interface Apartment {
    id: string;
    title?: string;
@@ -70,15 +107,38 @@ interface Apartment {
    createdAt: string;
 }
 
-interface MapViewProps {
-   apartments: Apartment[];
+interface Location {
+   id: string;
+   name: string;
+   address: string;
+   type: string;
+   description?: string;
+   lat: number;
+   lng: number;
+   iconColor: string;
+   createdAt: string;
 }
 
-export default function MapView({ apartments }: MapViewProps) {
+interface MapViewProps {
+   apartments: Apartment[];
+   locations?: Location[];
+}
+
+export default function MapView({ apartments, locations = [] }: MapViewProps) {
    const mapRef = useRef<L.Map | null>(null);
 
    // Coordenadas de Madrid
    const madridCenter: [number, number] = [40.4168, -3.7038];
+
+   const getLocationTypeLabel = (type: string) => {
+      const typeLabels: { [key: string]: string } = {
+         work: "Trabajo",
+         metro: "Metro/Transporte",
+         poi: "Punto de Interés",
+         other: "Otro",
+      };
+      return typeLabels[type] || "Otro";
+   };
 
    return (
       <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] w-full rounded-lg overflow-hidden border border-gray-300">
@@ -176,6 +236,48 @@ export default function MapView({ apartments }: MapViewProps) {
                               </p>
                            </div>
                         )}
+                     </div>
+                  </Popup>
+               </Marker>
+            ))}
+
+            {locations.map((location) => (
+               <Marker
+                  key={`location-${location.id}`}
+                  position={[location.lat, location.lng]}
+                  icon={createLocationIcon(location.iconColor, location.type)}
+               >
+                  <Popup>
+                     <div className="p-2 min-w-48 max-w-64">
+                        <div className="flex items-center justify-between mb-2">
+                           <h3 className="font-semibold text-lg text-purple-700">
+                              {location.name}
+                           </h3>
+                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                              {getLocationTypeLabel(location.type)}
+                           </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">
+                           📍 {location.address}
+                        </p>
+                        {location.description && (
+                           <div className="mt-2 pt-2 border-t border-gray-200">
+                              <p className="text-xs font-medium text-gray-700 mb-1">
+                                 Descripción:
+                              </p>
+                              <p className="text-sm text-gray-600 leading-relaxed">
+                                 {location.description}
+                              </p>
+                           </div>
+                        )}
+                        <div className="mt-2 pt-2 border-t border-gray-200">
+                           <p className="text-xs text-gray-500">
+                              📅 Agregado:{" "}
+                              {new Date(location.createdAt).toLocaleDateString(
+                                 "es-ES"
+                              )}
+                           </p>
+                        </div>
                      </div>
                   </Popup>
                </Marker>

@@ -49,6 +49,43 @@ const createCustomIcon = (color: string, status: string) => {
    });
 };
 
+// Función para crear iconos de ubicaciones personalizadas
+const createLocationIcon = (color: string, type: string) => {
+   const typeIcons: { [key: string]: string } = {
+      work: "💼",
+      metro: "🚇",
+      poi: "📍",
+      other: "📌",
+   };
+
+   const icon = typeIcons[type] || "📌";
+
+   return L.divIcon({
+      html: `
+         <div style="
+            background-color: ${color};
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+         ">
+            <span style="
+               font-size: 16px;
+               filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.5));
+            ">${icon}</span>
+         </div>
+      `,
+      className: "custom-location-marker-fullscreen",
+      iconSize: [35, 35],
+      iconAnchor: [17, 17],
+      popupAnchor: [0, -17],
+   });
+};
+
 interface Apartment {
    id: string;
    title?: string;
@@ -70,17 +107,41 @@ interface Apartment {
    createdAt: string;
 }
 
+interface Location {
+   id: string;
+   name: string;
+   address: string;
+   type: string;
+   description?: string;
+   lat: number;
+   lng: number;
+   iconColor: string;
+   createdAt: string;
+}
+
 interface FullScreenMapViewProps {
    apartments: Apartment[];
+   locations?: Location[];
 }
 
 export default function FullScreenMapView({
    apartments,
+   locations = [],
 }: FullScreenMapViewProps) {
    const mapRef = useRef<L.Map | null>(null);
 
    // Coordenadas de Madrid
    const madridCenter: [number, number] = [40.4168, -3.7038];
+
+   const getLocationTypeLabel = (type: string) => {
+      const typeLabels: { [key: string]: string } = {
+         work: "Trabajo",
+         metro: "Metro/Transporte",
+         poi: "Punto de Interés",
+         other: "Otro",
+      };
+      return typeLabels[type] || "Otro";
+   };
 
    return (
       <div className="h-full w-full">
@@ -182,6 +243,48 @@ export default function FullScreenMapView({
                            <p className="text-xs text-gray-400">
                               📅{" "}
                               {new Date(apartment.createdAt).toLocaleDateString(
+                                 "es-ES"
+                              )}
+                           </p>
+                        </div>
+                     </div>
+                  </Popup>
+               </Marker>
+            ))}
+
+            {locations.map((location) => (
+               <Marker
+                  key={`location-${location.id}`}
+                  position={[location.lat, location.lng]}
+                  icon={createLocationIcon(location.iconColor, location.type)}
+               >
+                  <Popup>
+                     <div className="p-3 min-w-56 max-w-72">
+                        <div className="flex items-center justify-between mb-3">
+                           <h3 className="font-semibold text-xl text-purple-700">
+                              {location.name}
+                           </h3>
+                           <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                              {getLocationTypeLabel(location.type)}
+                           </span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3">
+                           📍 {location.address}
+                        </p>
+                        {location.description && (
+                           <div className="mt-3 pt-3 border-t border-gray-200">
+                              <p className="text-xs font-medium text-gray-700 mb-1">
+                                 Descripción:
+                              </p>
+                              <p className="text-sm text-gray-600 leading-relaxed">
+                                 {location.description}
+                              </p>
+                           </div>
+                        )}
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                           <p className="text-xs text-gray-400">
+                              📅 Agregado:{" "}
+                              {new Date(location.createdAt).toLocaleDateString(
                                  "es-ES"
                               )}
                            </p>

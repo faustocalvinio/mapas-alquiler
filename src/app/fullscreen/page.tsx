@@ -40,8 +40,21 @@ interface Apartment {
    createdAt: string;
 }
 
+interface Location {
+   id: string;
+   name: string;
+   address: string;
+   type: string;
+   description?: string;
+   lat: number;
+   lng: number;
+   iconColor: string;
+   createdAt: string;
+}
+
 export default function FullscreenMap() {
    const [apartments, setApartments] = useState<Apartment[]>([]);
+   const [locations, setLocations] = useState<Location[]>([]);
    const [isLoading, setIsLoading] = useState(true);
    const [showFilters, setShowFilters] = useState(false);
    const [currentFilters, setCurrentFilters] = useState<{
@@ -80,8 +93,21 @@ export default function FullscreenMap() {
       }
    };
 
+   const fetchLocations = async () => {
+      try {
+         const response = await fetch("/api/locations");
+         if (response.ok) {
+            const data = await response.json();
+            setLocations(data);
+         }
+      } catch (error) {
+         console.error("Error al cargar ubicaciones:", error);
+      }
+   };
+
    useEffect(() => {
       fetchApartments();
+      fetchLocations();
    }, []);
 
    const handleFiltersChange = (newFilters: {
@@ -150,7 +176,7 @@ export default function FullscreenMap() {
                   </div>
 
                   {/* Lado derecho - Auth */}
-                  <div>
+                  <div className="flex items-center space-x-3">
                      <AuthButton />
                   </div>
                </div>
@@ -249,10 +275,16 @@ export default function FullscreenMap() {
             <div className="absolute inset-0 pt-16">
                {showFilters ? (
                   <div className="pt-20 h-full">
-                     <FullScreenMapView apartments={apartments} />
+                     <FullScreenMapView
+                        apartments={apartments}
+                        locations={locations}
+                     />
                   </div>
                ) : (
-                  <FullScreenMapView apartments={apartments} />
+                  <FullScreenMapView
+                     apartments={apartments}
+                     locations={locations}
+                  />
                )}
             </div>
 

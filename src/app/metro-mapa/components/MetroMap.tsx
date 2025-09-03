@@ -126,65 +126,65 @@ export default function MetroMap() {
    }
 
    return (
-    <div className="w-full h-screen">
-      <nav className="bg-white dark:bg-gray-800 shadow-md p-4">
-         <div className="container mx-auto flex justify-between items-center">
-            <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-               Mapa del Metro de Madrid
-            </h1>
-            <div className="flex space-x-4">
-               <Link
-                  href="/"
-                  className="text-blue-600 hover:underline dark:text-blue-300"
-               >
-                  Volver al inicio
-               </Link>
+      <div className="w-full h-screen">
+         <nav className="bg-white dark:bg-gray-800 shadow-md p-4">
+            <div className="container mx-auto flex justify-between items-center">
+               <h1 className="text-xl font-bold text-gray-800 dark:text-gray-100">
+                  Mapa del Metro de Madrid
+               </h1>
+               <div className="flex space-x-4">
+                  <Link
+                     href="/"
+                     className="text-blue-600 hover:underline dark:text-blue-300"
+                  >
+                     Volver al inicio
+                  </Link>
+               </div>
             </div>
-          </div>
-          </nav>
-      <MapContainer
-         center={[40.4168, -3.7038]}
-         zoom={12}
-         style={{ width: "100%", height: "100vh" }}
-         className="z-0"
-      >
-         <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-         />
+         </nav>
+         <MapContainer
+            center={[40.4168, -3.7038]}
+            zoom={12}
+            style={{ width: "100%", height: "100vh" }}
+            className="z-0"
+         >
+            <TileLayer
+               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
 
-         {/* Líneas de Metro y Metro Ligero */}
-         {metroData && (
-            <GeoJSON
-               data={metroData}
-               style={(_feature) => {
-                  const props = _feature?.properties;
-                  const lineType = props?.route_short_name;
-                  const isMetroLigero = lineType?.startsWith("ML");
+            {/* Líneas de Metro y Metro Ligero */}
+            {metroData && (
+               <GeoJSON
+                  data={metroData}
+                  style={(_feature) => {
+                     const props = _feature?.properties;
+                     const lineType = props?.route_short_name;
+                     const isMetroLigero = lineType?.startsWith("ML");
 
-                  return {
-                     color: getLineColor(props),
-                     weight: isMetroLigero ? 6 : 4, // Metro ligero más grueso
-                     opacity: isMetroLigero ? 0.9 : 0.8, // Metro ligero más opaco
-                     // Línea sólida para ambos tipos
-                     dashArray: undefined,
-                     // Añadir un borde más oscuro para el metro ligero
-                     ...(isMetroLigero && {
-                        lineCap: "round",
-                        lineJoin: "round",
-                     }),
-                  };
-               }}
-               onEachFeature={(feature, layer) => {
-                  const props = feature.properties;
-                  const routeName =
-                     props?.route_long_name ||
-                     props?.route_short_name ||
-                     "Línea de Metro";
-                  const shortName = props?.route_short_name || "N/A";
-                  const isMetroLigero = shortName?.startsWith("ML");
+                     return {
+                        color: getLineColor(props),
+                        weight: isMetroLigero ? 6 : 4, // Metro ligero más grueso
+                        opacity: isMetroLigero ? 0.9 : 0.8, // Metro ligero más opaco
+                        // Línea sólida para ambos tipos
+                        dashArray: undefined,
+                        // Añadir un borde más oscuro para el metro ligero
+                        ...(isMetroLigero && {
+                           lineCap: "round",
+                           lineJoin: "round",
+                        }),
+                     };
+                  }}
+                  onEachFeature={(feature, layer) => {
+                     const props = feature.properties;
+                     const routeName =
+                        props?.route_long_name ||
+                        props?.route_short_name ||
+                        "Línea de Metro";
+                     const shortName = props?.route_short_name || "N/A";
+                     const isMetroLigero = shortName?.startsWith("ML");
 
-                  layer.bindPopup(`
+                     layer.bindPopup(`
                      <div style="font-family: Arial, sans-serif;">
                         <h3 style="margin: 0 0 5px 0; color: #333;"><b>${routeName}</b></h3>
                         <p style="margin: 0; color: #666;">Línea: ${shortName}</p>
@@ -198,31 +198,31 @@ export default function MetroMap() {
                         }
                      </div>
                   `);
-               }}
-            />
-         )}
+                  }}
+               />
+            )}
 
-         {/* Paradas de Metro */}
-         {stopsData && (
-            <GeoJSON
-               data={stopsData}
-               pointToLayer={(feature, latlng) => {
-                  return L.circleMarker(latlng, {
-                     radius: 6,
-                     fillColor: "#fff",
-                     color: "#333",
-                     weight: 2,
-                     opacity: 1,
-                     fillOpacity: 0.8,
-                  });
-               }}
-               onEachFeature={(feature, layer) => {
-                  const props = feature.properties;
-                  const name = props?.name || "Parada";
-                  const code = props?.code || "N/A";
-                  const zone = props?.zone || "N/A";
+            {/* Paradas de Metro */}
+            {stopsData && (
+               <GeoJSON
+                  data={stopsData}
+                  pointToLayer={(feature, latlng) => {
+                     return L.circleMarker(latlng, {
+                        radius: 6,
+                        fillColor: "#fff",
+                        color: "#333",
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8,
+                     });
+                  }}
+                  onEachFeature={(feature, layer) => {
+                     const props = feature.properties;
+                     const name = props?.name || "Parada";
+                     const code = props?.code || "N/A";
+                     const zone = props?.zone || "N/A";
 
-                  layer.bindPopup(`
+                     layer.bindPopup(`
                      <div style="font-family: Arial, sans-serif;">
                         <h3 style="margin: 0 0 5px 0; color: #333;"><b>${name}</b></h3>
                         <p style="margin: 0; color: #666;">Código: ${code}</p>
@@ -234,10 +234,10 @@ export default function MetroMap() {
                         }
                      </div>
                   `);
-               }}
-            />
-         )}
-      </MapContainer>
-    </div>
+                  }}
+               />
+            )}
+         </MapContainer>
+      </div>
    );
 }

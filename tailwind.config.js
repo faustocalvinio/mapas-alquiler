@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    darkMode: 'media', // Usa las preferencias del sistema automáticamente
+    darkMode: 'class', // Usa la clase 'dark' para controlar el modo oscuro
     content: [
         './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
         './src/components/**/*.{js,ts,jsx,tsx,mdx}',

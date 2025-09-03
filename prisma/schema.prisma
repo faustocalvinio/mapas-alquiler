@@ -50,6 +50,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   apartments    Apartment[]
+  locations     Location[]
 }
 
 model VerificationToken {
@@ -76,4 +77,18 @@ model Apartment {
   userId    String?  // ID del usuario para la relación
   user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   createdAt DateTime @default(now())
+}
+
+model Location {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  type        String   // "work", "metro", "poi", "other"
+  description String?
+  lat         Float
+  lng         Float
+  iconColor   String   @default("#EF4444") // Color del icono en hex
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
 }

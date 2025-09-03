@@ -83,3 +83,42 @@ export async function POST(request: NextRequest) {
         )
     }
 }
+
+export async function GET(request: NextRequest) {
+    try {
+        const { searchParams } = new URL(request.url)
+        const address = searchParams.get('address')
+
+        if (!address) {
+            return NextResponse.json(
+                { error: 'Dirección es requerida' },
+                { status: 400 }
+            )
+        }
+
+        const coordinates = await geocodeAddress(address)
+
+        if (!coordinates) {
+            return NextResponse.json(
+                {
+                    valid: false,
+                    error: 'No se pudo encontrar la dirección. Verifica que sea una dirección válida en Madrid.'
+                },
+                { status: 400 }
+            )
+        }
+
+        return NextResponse.json({
+            valid: true,
+            lat: coordinates.lat,
+            lng: coordinates.lng,
+            formattedAddress: coordinates.fullAddress
+        })
+    } catch (error) {
+        console.error('Error validando dirección:', error)
+        return NextResponse.json(
+            { error: 'Error interno del servidor' },
+            { status: 500 }
+        )
+    }
+}

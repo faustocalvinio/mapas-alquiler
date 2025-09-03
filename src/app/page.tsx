@@ -40,8 +40,21 @@ interface Apartment {
    createdAt: string;
 }
 
+interface Location {
+   id: string;
+   name: string;
+   address: string;
+   type: string;
+   description?: string;
+   lat: number;
+   lng: number;
+   iconColor: string;
+   createdAt: string;
+}
+
 export default function Home() {
    const [apartments, setApartments] = useState<Apartment[]>([]);
+   const [locations, setLocations] = useState<Location[]>([]);
    const [isLoading, setIsLoading] = useState(true);
    const [currentFilters, setCurrentFilters] = useState<{
       minPrice?: number;
@@ -79,8 +92,21 @@ export default function Home() {
       }
    };
 
+   const fetchLocations = async () => {
+      try {
+         const response = await fetch("/api/locations");
+         if (response.ok) {
+            const data = await response.json();
+            setLocations(data);
+         }
+      } catch (error) {
+         console.error("Error al cargar ubicaciones:", error);
+      }
+   };
+
    useEffect(() => {
       fetchApartments();
+      fetchLocations();
    }, []);
 
    const handleFiltersChange = (filters: {
@@ -111,7 +137,14 @@ export default function Home() {
             <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
                <header className="text-center mb-6 sm:mb-8">
                   <div className="flex justify-between items-center mb-4">
-                     <div></div>
+                     <div className="flex items-center space-x-3">
+                        <Link
+                           href="/ubicaciones"
+                           className="inline-flex items-center px-3 py-2 text-sm font-medium text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-900 hover:bg-purple-200 dark:hover:bg-purple-800 rounded-md transition-colors"
+                        >
+                           📍 Mis Ubicaciones
+                        </Link>
+                     </div>
                      <AuthButton />
                   </div>
                </header>
@@ -129,9 +162,19 @@ export default function Home() {
                   <div className="lg:col-span-2">
                      <div className="bg-white dark:bg-gray-800 p-4 lg:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3 sm:gap-0">
-                           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                              Apartamentos ({apartments.length})
-                           </h2>
+                           <div>
+                              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                                 Apartamentos ({apartments.length})
+                              </h2>
+                              {locations.length > 0 && (
+                                 <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
+                                    📍 {locations.length} ubicación
+                                    {locations.length !== 1 ? "es" : ""}{" "}
+                                    personal{locations.length !== 1 ? "es" : ""}{" "}
+                                    en el mapa
+                                 </p>
+                              )}
+                           </div>
                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                               <Link
                                  href="/metro-mapa"
@@ -165,7 +208,10 @@ export default function Home() {
                            </div>
                         </div>
 
-                        <MapView apartments={apartments} />
+                        <MapView
+                           apartments={apartments}
+                           locations={locations}
+                        />
 
                         {apartments.length === 0 && !isLoading && (
                            <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400">
