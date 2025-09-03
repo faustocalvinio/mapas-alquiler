@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -22,10 +22,12 @@ export async function DELETE(
             return NextResponse.json({ error: "Usuario no encontrado" }, { status: 404 });
         }
 
+        const { id } = await params;
+
         // Verificar que la ubicación pertenece al usuario
         const location = await prisma.location.findFirst({
             where: {
-                id: params.id,
+                id: id,
                 userId: user.id,
             },
         });
@@ -38,7 +40,7 @@ export async function DELETE(
         }
 
         await prisma.location.delete({
-            where: { id: params.id },
+            where: { id: id },
         });
 
         return NextResponse.json({ success: true });
