@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -126,6 +126,7 @@ interface MapViewProps {
 
 export default function MapView({ apartments, locations = [] }: MapViewProps) {
    const mapRef = useRef<L.Map | null>(null);
+   const [mapType, setMapType] = useState<"street" | "satellite">("street");
 
    // Coordenadas de Madrid
    const madridCenter: [number, number] = [40.4168, -3.7038];
@@ -140,18 +141,42 @@ export default function MapView({ apartments, locations = [] }: MapViewProps) {
       return typeLabels[type] || "Otro";
    };
 
+   const toggleMapType = () => {
+      setMapType((prev) => (prev === "street" ? "satellite" : "street"));
+   };
+
    return (
       <div className="relative h-[400px] sm:h-[500px] lg:h-[600px] xl:h-[700px] w-full rounded-lg overflow-hidden border border-gray-300">
+         {/* Botón para cambiar vista */}
+         <button
+            onClick={toggleMapType}
+            className="absolute top-3 right-3 z-[1000] bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-md transition-colors"
+            title={
+               mapType === "street"
+                  ? "Cambiar a vista satelital"
+                  : "Cambiar a vista de calles"
+            }
+         >
+            {mapType === "street" ? "🛰️ Satélite" : "🗺️ Calles"}
+         </button>
+
          <MapContainer
             center={madridCenter}
             zoom={11}
             style={{ height: "100%", width: "100%" }}
             ref={mapRef}
          >
-            <TileLayer
-               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+            {mapType === "street" ? (
+               <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+               />
+            ) : (
+               <TileLayer
+                  attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+               />
+            )}
 
             {apartments.map((apartment) => (
                <Marker
