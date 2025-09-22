@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 
 export default function TestAuth() {
    const { data: session, status } = useSession();
@@ -67,18 +68,18 @@ export default function TestAuth() {
          <div className="mt-8 space-y-4">
             <h2 className="text-xl font-semibold">Enlaces de Prueba</h2>
             <div className="space-y-2">
-               <a href="/" className="block text-blue-600 hover:underline">
+               <Link href="/" className="block text-blue-600 hover:underline">
                   ← Volver al Mapa
-               </a>
-               <a href="/admin" className="block text-blue-600 hover:underline">
+               </Link>
+               <Link href="/admin" className="block text-blue-600 hover:underline">
                   Panel de Administración
-               </a>
-               <a
+               </Link>
+               <Link
                   href="/auth/signin"
                   className="block text-blue-600 hover:underline"
                >
                   Página de Login
-               </a>
+               </Link>
             </div>
          </div>
 
