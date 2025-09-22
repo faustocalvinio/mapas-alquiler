@@ -8,6 +8,7 @@ declare module "next-auth" {
             email?: string | null;
             image?: string | null;
             isAuthorized: boolean;
+            userType?: string;
         };
     }
 
@@ -16,5 +17,6 @@ declare module "next-auth" {
         name?: string | null;
         email?: string | null;
         image?: string | null;
+        userType?: string;
     }
 }

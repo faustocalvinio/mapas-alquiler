@@ -47,6 +47,8 @@ model User {
   emailVerified DateTime?
   image         String?
   isAuthorized  Boolean   @default(false)
+  password      String?   // Para usuarios con credenciales
+  userType      String    @default("google") // "google" o "viewer"
   accounts      Account[]
   sessions      Session[]
   apartments    Apartment[]
