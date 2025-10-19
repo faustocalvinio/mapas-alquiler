@@ -35,23 +35,41 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lng: numb
 }
 
 // Validar API key
-async function validateApiKey(apiKey: string): Promise<string | null> {
+async function validateApiKey(apiKey: string): Promise<{ userId: string | null; error?: string }> {
     try {
         // Buscar usuario por API key (email codificado en base64)
         const decodedEmail = Buffer.from(apiKey, 'base64').toString('utf-8')
+
+        console.log('🔍 Validando API Key para email:', decodedEmail)
 
         const user = await prisma.user.findUnique({
             where: { email: decodedEmail }
         })
 
-        if (!user || !user.isAuthorized) {
-            return null
+        if (!user) {
+            console.log('❌ Usuario no encontrado:', decodedEmail)
+            return {
+                userId: null,
+                error: `Usuario no encontrado con email: ${decodedEmail}. Primero inicia sesión en la aplicación.`
+            }
         }
 
-        return user.id
+        if (!user.isAuthorized) {
+            console.log('❌ Usuario no autorizado:', decodedEmail)
+            return {
+                userId: null,
+                error: `Usuario ${decodedEmail} no autorizado. Ejecuta: node scripts/authorize-user.js ${decodedEmail}`
+            }
+        }
+
+        console.log('✅ Usuario validado:', user.email)
+        return { userId: user.id }
     } catch (error) {
         console.error('Error validando API key:', error)
-        return null
+        return {
+            userId: null,
+            error: 'Error al decodificar API Key. Asegúrate de que sea un email válido en base64.'
+        }
     }
 }
 
@@ -67,14 +85,16 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        const userId = await validateApiKey(apiKey)
+        const validation = await validateApiKey(apiKey)
 
-        if (!userId) {
+        if (!validation.userId) {
             return NextResponse.json(
-                { error: 'API key inválida o usuario no autorizado' },
+                { error: validation.error || 'API key inválida o usuario no autorizado' },
                 { status: 403 }
             )
         }
+
+        const userId = validation.userId
 
         const body = await request.json()
         const {
@@ -181,17 +201,17 @@ export async function GET(request: NextRequest) {
             )
         }
 
-        const userId = await validateApiKey(apiKey)
+        const validation = await validateApiKey(apiKey)
 
-        if (!userId) {
+        if (!validation.userId) {
             return NextResponse.json(
-                { valid: false, error: 'API key inválida' },
+                { valid: false, error: validation.error || 'API key inválida' },
                 { status: 403 }
             )
         }
 
         const user = await prisma.user.findUnique({
-            where: { id: userId },
+            where: { id: validation.userId },
             select: {
                 name: true,
                 email: true
