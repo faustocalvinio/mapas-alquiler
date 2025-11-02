@@ -1,297 +1,190 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-// Función para geocoding usando Nominatim
-async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+// Constante de conversión
+const USD_TO_ARS_RATE = 1500;
+
+// GET - Obtener todos los apartamentos
+export async function GET() {
     try {
-        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address + ' Madrid')}&format=json&limit=1`
-        console.log('Realizando petición a Nominatim para apartamento:', url)
-
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': 'MapasAlquiler/1.0 (contacto@mapasalquiler.com)' // Reemplaza con tu email
-            }
-        })
-
-        if (!response.ok) {
-            console.error('Error en respuesta de Nominatim:', response.status, response.statusText)
-            return null
-        }
-
-        const contentType = response.headers.get('content-type')
-        if (!contentType || !contentType.includes('application/json')) {
-            console.error('Respuesta no es JSON:', contentType)
-            const text = await response.text()
-            console.error('Contenido de respuesta:', text.substring(0, 200))
-            return null
-        }
-
-        const data = await response.json()
-        console.log('Datos recibidos de Nominatim para apartamento:', data)
-
-        if (data && data.length > 0) {
-            return {
-                lat: parseFloat(data[0].lat),
-                lng: parseFloat(data[0].lon)
-            }
-        }
-        return null
-    } catch (error) {
-        console.error('Error en geocoding:', error)
-        return null
-    }
-}
-
-export async function GET(request: NextRequest) {
-    try {
-        const { searchParams } = new URL(request.url)
-        const minPrice = searchParams.get('minPrice')
-        const maxPrice = searchParams.get('maxPrice')
-        const zone = searchParams.get('zone')
-        const status = searchParams.get('status')
-
-        const whereClause: Record<string, unknown> = {}
-
-        if (minPrice || maxPrice) {
-            const priceFilter: Record<string, number> = {}
-            if (minPrice) priceFilter.gte = parseInt(minPrice)
-            if (maxPrice) priceFilter.lte = parseInt(maxPrice)
-            whereClause.price = priceFilter
-        }
-        if (zone) whereClause.zone = { contains: zone, mode: 'insensitive' }
-        if (status) whereClause.status = status
-
         const apartments = await prisma.apartment.findMany({
-            where: whereClause,
-            orderBy: { createdAt: 'desc' },
             include: {
                 user: {
                     select: {
                         name: true,
-                        email: true
-                    }
-                }
-            }
-        })
+                        email: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
 
-        return NextResponse.json(apartments)
+        // Normalizar los precios si faltan
+        const normalizedApartments = apartments.map((apt: any) => {
+            if (!apt.priceARS && apt.priceUSD) {
+                apt.priceARS = apt.priceUSD * USD_TO_ARS_RATE;
+            } else if (!apt.priceUSD && apt.priceARS) {
+                apt.priceUSD = apt.priceARS / USD_TO_ARS_RATE;
+            }
+            return apt;
+        });
+
+        return NextResponse.json(normalizedApartments);
     } catch (error) {
-        console.error('Error obteniendo apartamentos:', error)
+        console.error("Error fetching apartments:", error);
         return NextResponse.json(
-            { error: 'Error interno del servidor' },
+            { error: "Error al obtener los apartamentos" },
             { status: 500 }
-        )
+        );
     }
 }
 
+// POST - Crear un nuevo apartamento
 export async function POST(request: NextRequest) {
     try {
-        // Obtener sesión del usuario
-        const session = await getServerSession(authOptions)
+        const session = await getServerSession(authOptions);
 
-        if (!session?.user) {
+        if (!session?.user?.email) {
             return NextResponse.json(
-                { error: 'No autorizado' },
+                { error: "No autorizado" },
                 { status: 401 }
-            )
+            );
         }
 
-        const body = await request.json()
-        const { address, price, zone, title, notes, link, status, iconColor } = body
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+        });
 
-        // Validación
-        if (!address || !price) {
+        if (!user || !user.isAuthorized) {
             return NextResponse.json(
-                { error: 'Dirección y precio son requeridos' },
-                { status: 400 }
-            )
+                { error: "Usuario no autorizado para agregar apartamentos" },
+                { status: 403 }
+            );
         }
 
-        if (price <= 0) {
+        const body = await request.json();
+        const {
+            title,
+            address,
+            priceUSD,
+            priceARS,
+            currency,
+            zone,
+            neighborhood,
+            rooms,
+            bathrooms,
+            squareMeters,
+            expenses,
+            notes,
+            link,
+            lat,
+            lng,
+            status,
+            iconColor,
+        } = body;
+
+        // Validaciones
+        if (!address || !lat || !lng) {
             return NextResponse.json(
-                { error: 'El precio debe ser mayor a 0' },
+                { error: "Dirección y coordenadas son requeridas" },
                 { status: 400 }
-            )
+            );
         }
 
-        // Validar estado
-        if (status && !['available', 'rented'].includes(status)) {
+        // Asegurar que tengamos ambos precios
+        let finalPriceUSD = priceUSD;
+        let finalPriceARS = priceARS;
+
+        if (currency === "USD" && priceUSD && !priceARS) {
+            finalPriceARS = priceUSD * USD_TO_ARS_RATE;
+        } else if (currency === "ARS" && priceARS && !priceUSD) {
+            finalPriceUSD = priceARS / USD_TO_ARS_RATE;
+        }
+
+        if (!finalPriceUSD || finalPriceUSD <= 0) {
             return NextResponse.json(
-                { error: 'El estado debe ser "available" o "rented"' },
+                { error: "Precio inválido" },
                 { status: 400 }
-            )
+            );
         }
 
-        // Validar color (formato hex)
-        if (iconColor && !/^#[0-9A-F]{6}$/i.test(iconColor)) {
-            return NextResponse.json(
-                { error: 'El color debe estar en formato hexadecimal (ej: #FF5733)' },
-                { status: 400 }
-            )
-        }
-
-        // Geocoding
-        const coordinates = await geocodeAddress(address)
-        if (!coordinates) {
-            return NextResponse.json(
-                { error: 'No se pudo encontrar la dirección. Verifica que sea una dirección válida en Madrid.' },
-                { status: 400 }
-            )
-        }
-
-        // Extraer el primer nombre del usuario
-        const firstName = session.user.name?.split(' ')[0] || session.user.email?.split('@')[0] || 'Usuario'
-
-        // Crear apartamento
         const apartment = await prisma.apartment.create({
             data: {
                 title: title || null,
                 address,
-                price: parseInt(price),
+                priceUSD: finalPriceUSD,
+                priceARS: finalPriceARS,
+                currency: currency || "USD",
                 zone: zone || null,
+                neighborhood: neighborhood || null,
+                rooms: rooms ? parseInt(rooms) : null,
+                bathrooms: bathrooms ? parseInt(bathrooms) : null,
+                squareMeters: squareMeters ? parseFloat(squareMeters) : null,
+                expenses: expenses ? parseFloat(expenses) : null,
                 notes: notes || null,
                 link: link || null,
-                status: status || 'available',
-                iconColor: iconColor || '#3B82F6',
-                lat: coordinates.lat,
-                lng: coordinates.lng,
-                createdBy: firstName,
-                userId: session.user.id
-            }
-        })
+                lat: parseFloat(lat),
+                lng: parseFloat(lng),
+                status: status || "available",
+                iconColor: iconColor || "#3B82F6",
+                createdBy: user.name?.split(" ")[0] || user.email.split("@")[0],
+                userId: user.id,
+            },
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        email: true,
+                    },
+                },
+            },
+        });
 
-        return NextResponse.json(apartment, { status: 201 })
+        return NextResponse.json(apartment, { status: 201 });
     } catch (error) {
-        console.error('Error creando apartamento:', error)
+        console.error("Error creating apartment:", error);
         return NextResponse.json(
-            { error: 'Error interno del servidor' },
+            { error: "Error al crear el apartamento" },
             { status: 500 }
-        )
+        );
     }
 }
 
-export async function DELETE(request: NextRequest) {
+// DELETE - Eliminar todos los apartamentos (solo para desarrollo/testing)
+export async function DELETE() {
     try {
-        const { searchParams } = new URL(request.url)
-        const id = searchParams.get('id')
+        const session = await getServerSession(authOptions);
 
-        if (!id) {
+        if (!session?.user?.email) {
             return NextResponse.json(
-                { error: 'ID del apartamento es requerido' },
-                { status: 400 }
-            )
+                { error: "No autorizado" },
+                { status: 401 }
+            );
         }
 
-        await prisma.apartment.delete({
-            where: { id }
-        })
+        const user = await prisma.user.findUnique({
+            where: { email: session.user.email },
+        });
 
-        return NextResponse.json({ message: 'Apartamento eliminado correctamente' })
+        if (!user || !user.isAuthorized) {
+            return NextResponse.json(
+                { error: "Usuario no autorizado" },
+                { status: 403 }
+            );
+        }
+
+        await prisma.apartment.deleteMany({});
+
+        return NextResponse.json({ message: "Todos los apartamentos eliminados" });
     } catch (error) {
-        console.error('Error eliminando apartamento:', error)
+        console.error("Error deleting apartments:", error);
         return NextResponse.json(
-            { error: 'Error interno del servidor' },
+            { error: "Error al eliminar apartamentos" },
             { status: 500 }
-        )
-    }
-}
-
-export async function PUT(request: NextRequest) {
-    try {
-        const { searchParams } = new URL(request.url)
-        const id = searchParams.get('id')
-
-        if (!id) {
-            return NextResponse.json(
-                { error: 'ID del apartamento es requerido' },
-                { status: 400 }
-            )
-        }
-
-        const body = await request.json()
-        const { address, price, zone, title, notes, link, status, iconColor } = body
-
-        // Validación
-        if (!address || !price) {
-            return NextResponse.json(
-                { error: 'Dirección y precio son requeridos' },
-                { status: 400 }
-            )
-        }
-
-        if (price <= 0) {
-            return NextResponse.json(
-                { error: 'El precio debe ser mayor a 0' },
-                { status: 400 }
-            )
-        }
-
-        // Validar estado
-        if (status && !['available', 'rented'].includes(status)) {
-            return NextResponse.json(
-                { error: 'El estado debe ser "available" o "rented"' },
-                { status: 400 }
-            )
-        }
-
-        // Validar color (formato hex)
-        if (iconColor && !/^#[0-9A-F]{6}$/i.test(iconColor)) {
-            return NextResponse.json(
-                { error: 'El color debe estar en formato hexadecimal (ej: #FF5733)' },
-                { status: 400 }
-            )
-        }
-
-        // Verificar si el apartamento existe
-        const existingApartment = await prisma.apartment.findUnique({
-            where: { id }
-        })
-
-        if (!existingApartment) {
-            return NextResponse.json(
-                { error: 'Apartamento no encontrado' },
-                { status: 404 }
-            )
-        }
-
-        // Solo hacer geocoding si la dirección cambió
-        let coordinates = { lat: existingApartment.lat, lng: existingApartment.lng }
-        if (address !== existingApartment.address) {
-            const newCoordinates = await geocodeAddress(address)
-            if (!newCoordinates) {
-                return NextResponse.json(
-                    { error: 'No se pudo encontrar la dirección. Verifica que sea una dirección válida en Madrid.' },
-                    { status: 400 }
-                )
-            }
-            coordinates = newCoordinates
-        }
-
-        // Actualizar apartamento
-        const updatedApartment = await prisma.apartment.update({
-            where: { id },
-            data: {
-                title: title || null,
-                address,
-                price: parseInt(price),
-                zone: zone || null,
-                notes: notes || null,
-                link: link || null,
-                status: status || 'available',
-                iconColor: iconColor || '#3B82F6',
-                lat: coordinates.lat,
-                lng: coordinates.lng
-            }
-        })
-
-        return NextResponse.json(updatedApartment)
-    } catch (error) {
-        console.error('Error actualizando apartamento:', error)
-        return NextResponse.json(
-            { error: 'Error interno del servidor' },
-            { status: 500 }
-        )
+        );
     }
 }

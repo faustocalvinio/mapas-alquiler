@@ -1,0 +1,40 @@
+{
+   "name": "zonaprop-to-mapas-alquiler",
+   "version": "1.0.0",
+   "description": "Extensión de Chrome para guardar automáticamente tus favoritos de ZonaProp",
+   "author": "Tu Nombre",
+   "repository": "https://github.com/tu-usuario/mapas-alquiler",
+   "scripts": {
+      "build": "echo 'No se requiere build para esta extensión'",
+      "watch": "echo 'Recarga la extensión en chrome://extensions/ después de hacer cambios'",
+      "test": "echo 'Abre chrome-extension/TESTING.md para instrucciones de prueba'"
+   },
+   "configuration": {
+      "defaultApiUrl": "http://localhost:3000",
+      "defaultUsdRate": 1500,
+      "supportedSites": [
+         "https://www.zonaprop.com.ar/*"
+      ]
+   },
+   "selectors": {
+      "note": "Estos selectores pueden necesitar actualizarse si ZonaProp cambia su HTML",
+      "propertyCards": "[data-qa=\"posting PROPERTY\"]",
+      "price": "[data-qa=\"POSTING_CARD_PRICE\"]",
+      "expenses": "[data-qa=\"expensas\"]",
+      "location": "[data-qa=\"POSTING_CARD_LOCATION\"]",
+      "features": "[data-qa=\"POSTING_CARD_FEATURES\"]",
+      "link": "a[data-qa=\"posting-link\"]",
+      "title": "[data-qa=\"POSTING_CARD_DESCRIPTION\"]"
+   },
+   "development": {
+      "reloadExtensionUrl": "chrome://extensions/",
+      "zonapropTestUrl": "https://www.zonaprop.com.ar/departamentos-alquiler-capital-federal.html",
+      "devtools": "F12 para abrir DevTools y ver logs"
+   },
+   "notes": [
+      "Recuerda recargar la extensión después de hacer cambios",
+      "Los selectores de ZonaProp pueden cambiar - actualiza en content.js si es necesario",
+      "La API Key debe ser generada con npm run extension:create-user",
+      "Los iconos pueden generarse con npm run extension:generate-icons"
+   ]
+}

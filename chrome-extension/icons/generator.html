@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generador de Iconos</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    canvas { border: 1px solid #ccc; margin: 10px; }
+    button { padding: 10px 20px; margin: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Generador de Iconos - Extensión Chrome</h1>
+  <p>Haz clic en los botones para descargar cada icono</p>
+  
+  <div>
+    <canvas id="canvas16" width="16" height="16"></canvas>
+    <button onclick="download(16)">Descargar 16x16</button>
+  </div>
+  
+  <div>
+    <canvas id="canvas48" width="48" height="48"></canvas>
+    <button onclick="download(48)">Descargar 48x48</button>
+  </div>
+  
+  <div>
+    <canvas id="canvas128" width="128" height="128"></canvas>
+    <button onclick="download(128)">Descargar 128x128</button>
+  </div>
+
+  <script>
+    function drawIcon(size) {
+      const canvas = document.getElementById('canvas' + size);
+      const ctx = canvas.getContext('2d');
+      
+      // Fondo azul con bordes redondeados
+      ctx.fillStyle = '#3b82f6';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, size * 0.2);
+      ctx.fill();
+      
+      // Emoji de casa
+      ctx.font = (size * 0.6) + 'px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('🏠', size / 2, size / 2);
+    }
+    
+    function download(size) {
+      const canvas = document.getElementById('canvas' + size);
+      const link = document.createElement('a');
+      link.download = 'icon' + size + '.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+    
+    // Dibujar los iconos al cargar
+    drawIcon(16);
+    drawIcon(48);
+    drawIcon(128);
+  </script>
+</body>
+</html>
+  

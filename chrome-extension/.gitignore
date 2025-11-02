@@ -1,0 +1,20 @@
+# Archivos de configuración personal
+config.local.json
+.env.local
+
+# Iconos generados temporalmente
+icons/*.tmp
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Backups
+*.backup
+*~
+
+# Node modules (si decides agregar dependencias)
+node_modules/

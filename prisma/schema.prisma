@@ -64,21 +64,29 @@ model VerificationToken {
 }
 
 model Apartment {
-  id        String   @id @default(cuid())
-  title     String?
-  address   String
-  price     Int
-  zone      String?
-  notes     String?
-  link      String?  // Link adicional del apartamento
-  lat       Float
-  lng       Float
-  status    String   @default("available") // "available" o "rented"
-  iconColor String   @default("#3B82F6") // Color del icono en hex
-  createdBy String?  // Primer nombre del usuario que lo agregó
-  userId    String?  // ID del usuario para la relación
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  title       String?
+  address     String
+  priceUSD    Float    // Precio en dólares
+  priceARS    Float?   // Precio en pesos (opcional, se calcula automáticamente si no se provee)
+  currency    String   @default("USD") // "USD" o "ARS" - indica en qué moneda fue ingresado originalmente
+  zone        String?  // Barrio de CABA (Palermo, Recoleta, Belgrano, etc.)
+  neighborhood String? // Sub-zona o barrio específico
+  rooms       Int?     // Cantidad de ambientes
+  bathrooms   Int?     // Cantidad de baños
+  squareMeters Float?  // Metros cuadrados
+  expenses    Float?   // Expensas en ARS
+  notes       String?
+  link        String?  // Link adicional del apartamento
+  lat         Float
+  lng         Float
+  status      String   @default("available") // "available", "rented", "reserved"
+  iconColor   String   @default("#3B82F6") // Color del icono en hex
+  createdBy   String?  // Primer nombre del usuario que lo agregó
+  userId      String?  // ID del usuario para la relación
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Location {

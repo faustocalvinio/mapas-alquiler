@@ -1,96 +1,104 @@
-# 🏠 Idealista to Mapas Alquiler - Chrome Extension
+# 🏠 Extensión Chrome - ZonaProp to Mapas Alquiler
 
-Extensión de Chrome para agregar apartamentos de Idealista a tu aplicación Mapas Alquiler con un solo click.
+Extensión de Chrome para guardar automáticamente tus favoritos de ZonaProp en tu aplicación de mapas de alquiler.
 
-## 🚀 Características
+## 🌟 Características
 
-- ✅ Extrae automáticamente información de anuncios de Idealista
-- ✅ Captura título, dirección, precio, zona y descripción
-- ✅ Envía datos directamente a tu aplicación
-- ✅ Vista previa de datos antes de guardar
-- ✅ Configuración simple con API Key
-- ✅ Autenticación segura
+- ✅ **Sincronización automática** de favoritos desde ZonaProp
+- 💵 **Conversión automática a USD** con tasa configurable
+- 🏷️ **Extracción completa de datos**: precio, expensas, ubicación, características
+- 🔐 **Autenticación segura** mediante API Key
+- 🎯 **Botón flotante** en páginas de detalle para guardar rápidamente
+- 📊 **Interfaz intuitiva** para configuración y seguimiento
 
-## 📋 Requisitos previos
+## 📦 Instalación
 
-1. Tener la aplicación **Mapas Alquiler** corriendo (localhost o producción)
-2. Una cuenta de usuario autorizada en la aplicación
-3. Google Chrome o navegador basado en Chromium
+### 1. Preparar la extensión
 
-## 🔧 Instalación
+La extensión ya está creada en la carpeta `chrome-extension/`. Solo necesitas cargarla en Chrome.
 
-### 1. Preparar los íconos
-
-La extensión necesita tres íconos. Puedes crearlos con cualquier herramienta de diseño o usar placeholders:
-
-- `icons/icon16.png` (16x16px)
-- `icons/icon48.png` (48x48px)
-- `icons/icon128.png` (128x128px)
-
-**Opción rápida:** Usa [este generador online](https://www.favicon-generator.org/) para crear los íconos a partir de una imagen.
-
-### 2. Instalar la extensión en Chrome
+### 2. Cargar en Chrome
 
 1. Abre Chrome y ve a `chrome://extensions/`
-2. Activa el **Modo de desarrollador** (esquina superior derecha)
-3. Haz click en **Cargar extensión sin empaquetar**
-4. Selecciona la carpeta `chrome-extension` de este proyecto
-5. ¡Listo! Verás el ícono de la extensión en tu barra de herramientas
+2. Activa el **"Modo de desarrollador"** en la esquina superior derecha
+3. Haz clic en **"Cargar extensión sin empaquetar"**
+4. Selecciona la carpeta `chrome-extension/` de este proyecto
+5. La extensión aparecerá en tu barra de herramientas
 
-## ⚙️ Configuración
+### 3. Crear iconos (opcional)
 
-### 1. Obtener tu API Key
+Los iconos se generarán automáticamente, pero puedes crear tus propios iconos personalizados:
 
-Tu API Key es tu email codificado en base64. Puedes obtenerla de dos formas:
+- `icons/icon16.png` - 16x16px
+- `icons/icon48.png` - 48x48px
+- `icons/icon128.png` - 128x128px
 
-**Opción A - En línea de comandos:**
+Por ahora, puedes usar emojis o crear iconos simples. Ejecuta este comando para crear iconos básicos:
+
 ```bash
-# En PowerShell (Windows)
-[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("tu-email@example.com"))
-
-# En terminal Unix/Mac
-echo -n "tu-email@example.com" | base64
+cd chrome-extension
+mkdir -p icons
+# Aquí puedes agregar tus propios iconos o usar una herramienta online
 ```
 
-**Opción B - En el navegador:**
-```javascript
-// Abre la consola del navegador (F12) y ejecuta:
-btoa("tu-email@example.com")
+## 🔧 Configuración
+
+### 1. Generar API Key
+
+Primero necesitas crear un usuario y generar una API Key:
+
+```bash
+# Ejecuta desde la raíz del proyecto
+npm run create-viewer
 ```
+
+Esto te pedirá crear un usuario y te dará una API Key. **Guarda esta API Key**, la necesitarás para configurar la extensión.
 
 ### 2. Configurar la extensión
 
-1. Haz click en el ícono de la extensión
-2. Ve a la pestaña **Configuración**
-3. Ingresa la **URL de tu API**:
-   - Desarrollo: `http://localhost:3000`
-   - Producción: `https://tu-app.vercel.app`
-4. Ingresa tu **API Key** (el email en base64)
-5. Haz click en **Guardar configuración**
-6. Haz click en **Probar conexión** para verificar
+1. Haz clic en el ícono de la extensión en Chrome
+2. Ingresa tu **API Key** (generada en el paso anterior)
+3. Ingresa la **URL del API** (por defecto: `http://localhost:3000`)
+4. Configura la **tasa USD/ARS** actual (por defecto: 1500)
+5. Haz clic en **"Guardar"**
+6. Opcionalmente, haz clic en **"Probar"** para verificar la conexión
 
-## 📖 Uso
+## 🚀 Uso
 
-### Agregar un apartamento desde Idealista
+### Método 1: Sincronización masiva
 
-1. Navega a cualquier anuncio de Idealista (ej: `https://www.idealista.com/inmueble/...`)
-2. Haz click en el ícono de la extensión
-3. En la pestaña **Extraer**, haz click en **📥 Extraer datos de esta página**
-4. Revisa la vista previa de los datos extraídos
-5. Haz click en **💾 Guardar apartamento**
-6. ¡Listo! El apartamento se agregará a tu aplicación
+1. Ve a tu página de **favoritos en ZonaProp**
+2. Haz clic en el ícono de la extensión
+3. Haz clic en **"Sincronizar Favoritos"**
+4. La extensión extraerá todos los favoritos visibles y los guardará en tu aplicación
 
-## 🔍 Datos que extrae
+### Método 2: Guardar individualmente
 
-La extensión captura automáticamente:
+1. Abre cualquier **publicación de ZonaProp**
+2. Verás un **botón flotante "💾 Guardar en Mapas"** en la esquina inferior derecha
+3. Haz clic para guardar esa propiedad específicamente
 
-- **Título**: Nombre del inmueble
-- **Dirección**: Dirección completa
-- **Precio**: Precio mensual de alquiler
-- **Zona/Barrio**: Zona o barrio (extraído de la dirección)
-- **Descripción**: Descripción del inmueble (guardada en "notas")
-- **Características**: Metros cuadrados, habitaciones, etc.
-- **Link**: URL del anuncio de Idealista
+## 📊 Datos extraídos
+
+La extensión extrae automáticamente:
+
+- 🏠 **Título** de la propiedad
+- 📍 **Dirección completa**
+- 💰 **Precio** (en ARS o USD)
+- 🏷️ **Expensas**
+- 🛏️ **Cantidad de ambientes**
+- 🚿 **Cantidad de baños**
+- 📐 **Metros cuadrados**
+- 🔗 **Link** a la publicación original
+
+## 💱 Conversión de precios
+
+La extensión convierte automáticamente todos los precios a USD:
+
+- Si el precio está en **ARS**: `(Precio + Expensas) / Tasa USD`
+- Si el precio está en **USD**: Se suma directamente con las expensas convertidas
+
+**Importante**: Actualiza regularmente la tasa USD/ARS en la configuración para mantener conversiones precisas.
 
 ## 🛠️ Desarrollo
 
@@ -99,88 +107,98 @@ La extensión captura automáticamente:
 ```
 chrome-extension/
 ├── manifest.json       # Configuración de la extensión
-├── popup.html         # Interfaz del popup
-├── popup.js           # Lógica del popup
-├── content.js         # Script para extraer datos de Idealista
-├── README.md          # Este archivo
-└── icons/
-    ├── icon16.png     # Ícono 16x16
-    ├── icon48.png     # Ícono 48x48
-    └── icon128.png    # Ícono 128x128
+├── popup.html          # Interfaz del popup
+├── popup.js            # Lógica del popup
+├── content.js          # Script que se ejecuta en ZonaProp
+├── background.js       # Service worker de fondo
+└── icons/             # Iconos de la extensión
+    ├── icon16.png
+    ├── icon48.png
+    └── icon128.png
 ```
-
-### Modificar la extensión
-
-1. Haz cambios en los archivos
-2. Ve a `chrome://extensions/`
-3. Haz click en el botón de **recargar** (🔄) de la extensión
-4. Prueba los cambios
 
 ### API Endpoint
 
-La extensión hace POST a: `/api/apartments/from-extension`
+La extensión envía datos a: `POST /api/apartments/extension`
 
-**Headers requeridos:**
+Headers requeridos:
 ```
-x-api-key: <tu-email-en-base64>
 Content-Type: application/json
+X-API-Key: tu-api-key-aqui
 ```
 
-**Body esperado:**
+Body:
 ```json
 {
-  "title": "Apartamento en Malasaña",
-  "address": "Calle San Bernardo 15, Malasaña, Madrid",
-  "price": 1200,
-  "zone": "Malasaña",
-  "notes": "Descripción y características...",
-  "link": "https://www.idealista.com/inmueble/...",
-  "status": "available",
-  "iconColor": "#3B82F6"
+  "title": "Departamento 2 ambientes",
+  "address": "Av. Santa Fe 1234, Palermo",
+  "priceARS": 500000,
+  "currency": "ARS",
+  "expenses": 50000,
+  "rooms": 2,
+  "bathrooms": 1,
+  "squareMeters": 45,
+  "link": "https://www.zonaprop.com.ar/...",
+  "usdRate": 1500
 }
 ```
 
 ## 🐛 Solución de problemas
 
-### La extensión no extrae datos
+### La extensión no guarda propiedades
 
-1. **Recarga la página de Idealista** - A veces el content script no se carga correctamente
-2. **Verifica que estás en una página de anuncio** - La URL debe contener `/inmueble/`
-3. **Revisa la consola** - Abre DevTools (F12) y busca errores
+1. **Verifica tu API Key**: Asegúrate de que la API Key sea correcta
+2. **Revisa la URL del API**: Debe ser la URL completa sin `/api/apartments`
+3. **Comprueba la consola**: Abre DevTools (F12) para ver errores
 
-### Error de conexión con la API
+### No se detectan favoritos
 
-1. **Verifica que la aplicación esté corriendo** - Abre la URL en tu navegador
-2. **Comprueba la API Key** - Usa "Probar conexión" en la configuración
-3. **Revisa los permisos CORS** - La API debe aceptar requests desde la extensión
+1. Asegúrate de estar en la **página de favoritos** de ZonaProp
+2. La estructura de ZonaProp puede cambiar - verifica los selectores en `content.js`
+3. Espera a que la página cargue completamente antes de sincronizar
 
-### "API Key inválida"
+### Error de CORS
 
-1. Verifica que tu email esté correctamente codificado en base64
-2. Asegúrate de que tu usuario esté **autorizado** (`isAuthorized: true`) en la base de datos
-3. Comprueba que el email coincida exactamente con el de tu cuenta
+Si tu API está en un servidor diferente, asegúrate de configurar CORS correctamente:
+
+```typescript
+// En tu API route
+headers: {
+  'Access-Control-Allow-Origin': 'chrome-extension://*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, X-API-Key',
+}
+```
 
 ## 🔒 Seguridad
 
-- La API Key se guarda localmente en Chrome usando `chrome.storage.sync`
-- Solo usuarios autorizados pueden usar la extensión
-- Las peticiones se hacen con HTTPS en producción
-- El endpoint valida la API Key en cada request
+- ✅ La API Key se almacena de forma segura en `chrome.storage.sync`
+- ✅ Solo funciona en dominios autorizados (ZonaProp)
+- ✅ Todas las peticiones usan HTTPS en producción
+- ⚠️ **No compartas tu API Key con nadie**
 
-## 📝 Notas
+## 🔄 Actualizar la extensión
 
-- La extensión solo funciona en páginas de **Idealista.com**
-- Los datos se geocodifican automáticamente en el servidor
-- Si la dirección no se puede geocodificar, recibirás un error
-- Puedes editar los apartamentos desde la aplicación web
+1. Haz cambios en los archivos de la extensión
+2. Ve a `chrome://extensions/`
+3. Haz clic en el botón **"Actualizar"** (🔄) en la tarjeta de tu extensión
+
+## 📝 TODO / Mejoras futuras
+
+- [ ] Soporte para múltiples portales inmobiliarios
+- [ ] Detección automática de duplicados más inteligente
+- [ ] Sincronización bidireccional
+- [ ] Notificaciones de nuevos favoritos
+- [ ] Filtros y categorización automática
+- [ ] Exportar/importar configuración
 
 ## 🤝 Contribuir
 
-Si encuentras bugs o quieres agregar features:
+Si encuentras bugs o quieres agregar funcionalidades:
 
-1. Modifica los archivos necesarios
-2. Prueba los cambios
-3. Documenta las mejoras
+1. Modifica los archivos en `chrome-extension/`
+2. Prueba los cambios recargando la extensión
+3. Documenta los cambios
 
 ## 📄 Licencia
 
@@ -188,4 +206,4 @@ Este proyecto es parte de la aplicación Mapas Alquiler.
 
 ---
 
-**¿Necesitas ayuda?** Revisa la consola del navegador (F12) para ver logs detallados de la extensión.
+**¿Necesitas ayuda?** Abre un issue en el repositorio o consulta la documentación de la aplicación principal.

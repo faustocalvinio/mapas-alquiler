@@ -1,260 +1,259 @@
-// popup.js - Lógica del popup de la extensión
-
-let extractedData = null;
-
-// Cargar configuración al abrir el popup
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadConfig();
-    setupEventListeners();
-    checkIfIdealistaPage();
-});
-
-// Configurar event listeners
-function setupEventListeners() {
-    // Tabs
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.addEventListener('click', () => switchTab(button.dataset.tab));
-    });
-
-    // Botones
-    document.getElementById('extract-btn').addEventListener('click', extractData);
-    document.getElementById('save-btn').addEventListener('click', saveApartment);
-    document.getElementById('save-config').addEventListener('click', saveConfig);
-    document.getElementById('test-connection').addEventListener('click', testConnection);
-}
-
-// Cambiar entre tabs
-function switchTab(tabName) {
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-    document.getElementById(`${tabName}-tab`).classList.add('active');
-}
+// Elementos del DOM
+const apiKeyInput = document.getElementById('apiKey');
+const apiUrlInput = document.getElementById('apiUrl');
+const usdRateInput = document.getElementById('usdRate');
+const saveBtn = document.getElementById('saveBtn');
+const testBtn = document.getElementById('testBtn');
+const syncBtn = document.getElementById('syncBtn');
+const statusDiv = document.getElementById('status');
 
 // Cargar configuración guardada
-async function loadConfig() {
-    try {
-        const result = await chrome.storage.sync.get(['apiUrl', 'apiKey']);
-
-        if (result.apiUrl) {
-            document.getElementById('api-url').value = result.apiUrl;
-        } else {
-            // Sugerir URL de producción por defecto
-            document.getElementById('api-url').value = 'https://mapa.facal.space';
-        }
-
-        if (result.apiKey) {
-            document.getElementById('api-key').value = result.apiKey;
-        }
-    } catch (error) {
-        console.error('Error cargando configuración:', error);
+chrome.storage.sync.get(['apiKey', 'apiUrl', 'usdRate'], (result) => {
+    if (result.apiKey) {
+        apiKeyInput.value = result.apiKey;
     }
+    if (result.apiUrl) {
+        apiUrlInput.value = result.apiUrl;
+    }
+    if (result.usdRate) {
+        usdRateInput.value = result.usdRate;
+    }
+});
+
+// Función para mostrar mensajes de estado
+function showStatus(message, type) {
+    statusDiv.textContent = message;
+    statusDiv.className = `status ${type}`;
+    statusDiv.style.display = 'block';
+
+    setTimeout(() => {
+        statusDiv.style.display = 'none';
+    }, 5000);
 }
 
 // Guardar configuración
-async function saveConfig() {
-    const apiUrl = document.getElementById('api-url').value.trim();
-    const apiKey = document.getElementById('api-key').value.trim();
+saveBtn.addEventListener('click', () => {
+    const apiKey = apiKeyInput.value.trim();
+    const apiUrl = apiUrlInput.value.trim();
+    const usdRate = parseFloat(usdRateInput.value);
 
-    if (!apiUrl || !apiKey) {
-        showStatus('error', 'Por favor completa todos los campos');
+    if (!apiKey) {
+        showStatus('Por favor ingresa una API Key', 'error');
         return;
     }
 
-    // Validar formato de URL
-    try {
-        new URL(apiUrl);
-    } catch (e) {
-        showStatus('error', 'URL inválida. Usa formato: http://localhost:3000');
+    if (!apiUrl) {
+        showStatus('Por favor ingresa la URL del API', 'error');
+        return;
+    }
+
+    if (!usdRate || usdRate <= 0) {
+        showStatus('Por favor ingresa una tasa de cambio válida', 'error');
+        return;
+    }
+
+    chrome.storage.sync.set({
+        apiKey,
+        apiUrl,
+        usdRate
+    }, () => {
+        showStatus('✓ Configuración guardada correctamente', 'success');
+    });
+});
+
+// Probar conexión
+testBtn.addEventListener('click', async () => {
+    const apiUrl = apiUrlInput.value.trim();
+
+    if (!apiUrl) {
+        showStatus('Por favor ingresa la URL del API', 'error');
         return;
     }
 
     try {
-        await chrome.storage.sync.set({ apiUrl, apiKey });
-        showStatus('success', '✅ Configuración guardada correctamente');
-    } catch (error) {
-        showStatus('error', '❌ Error guardando configuración: ' + error.message);
-    }
-}
-
-// Probar conexión con la API
-async function testConnection() {
-    const apiUrl = document.getElementById('api-url').value.trim();
-    const apiKey = document.getElementById('api-key').value.trim();
-
-    if (!apiUrl || !apiKey) {
-        showStatus('error', 'Por favor configura la URL y API Key primero');
-        return;
-    }
-
-    showStatus('info', '🔄 Probando conexión...');
-
-    try {
-        const response = await fetch(`${apiUrl}/api/apartments/from-extension`, {
+        showStatus('Probando conexión...', 'info');
+        const response = await fetch(`${apiUrl}/api/apartments`, {
             method: 'GET',
             headers: {
-                'x-api-key': apiKey,
                 'Content-Type': 'application/json'
             }
         });
 
-        const data = await response.json();
-
-        if (data.valid) {
-            showStatus('success', `✅ Conexión exitosa! Usuario: ${data.user.name || data.user.email}`);
+        if (response.ok) {
+            showStatus('✓ Conexión exitosa con el API', 'success');
         } else {
-            showStatus('error', '❌ API Key inválida o usuario no autorizado');
+            showStatus(`Error: ${response.status} - ${response.statusText}`, 'error');
         }
     } catch (error) {
-        showStatus('error', '❌ Error de conexión: ' + error.message);
+        showStatus(`Error de conexión: ${error.message}`, 'error');
     }
-}
+});
 
-// Verificar si estamos en una página de Idealista
-async function checkIfIdealistaPage() {
-    try {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+// Sincronizar favoritos
+syncBtn.addEventListener('click', async () => {
+    const apiKey = apiKeyInput.value.trim();
+    const apiUrl = apiUrlInput.value.trim();
+    const usdRate = parseFloat(usdRateInput.value);
 
-        if (!tab.url.includes('idealista.com')) {
-            showStatus('warning', '⚠️ Abre una página de anuncio de Idealista para extraer datos');
-            document.getElementById('extract-btn').disabled = true;
-        } else {
-            document.getElementById('extract-btn').disabled = false;
-        }
-    } catch (error) {
-        console.error('Error verificando página:', error);
+    if (!apiKey) {
+        showStatus('Por favor configura tu API Key primero', 'error');
+        return;
     }
-}
-
-// Extraer datos de la página
-async function extractData() {
-    showStatus('info', '🔄 Extrayendo datos...');
 
     try {
+        // Obtener la pestaña activa
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-        if (!tab.url.includes('idealista.com')) {
-            showStatus('error', '❌ Esta extensión solo funciona en páginas de Idealista');
+        if (!tab.url.includes('zonaprop.com.ar')) {
+            showStatus('Por favor abre la página de ZonaProp primero', 'error');
             return;
         }
 
-        // Enviar mensaje al content script
-        const response = await chrome.tabs.sendMessage(tab.id, { action: 'extractData' });
+        showStatus('Iniciando sincronización...', 'info');
+        syncBtn.disabled = true;
 
-        if (response.success) {
-            extractedData = response.data;
-            displayPreview(extractedData);
-            showStatus('success', '✅ Datos extraídos correctamente');
-
-            // Mostrar botón de guardar
-            document.getElementById('save-btn').classList.remove('hidden');
-            document.getElementById('save-btn').disabled = false;
-        } else {
-            showStatus('error', '❌ Error: ' + response.error);
-        }
-    } catch (error) {
-        console.error('Error extrayendo datos:', error);
-        showStatus('error', '❌ Error: ' + error.message + '. Recarga la página de Idealista.');
-    }
-}
-
-// Mostrar preview de los datos extraídos
-function displayPreview(data) {
-    const previewContent = document.getElementById('preview-content');
-    const preview = document.getElementById('apartment-preview');
-
-    let html = '';
-
-    if (data.title) {
-        html += `<div class="preview-item"><span class="preview-label">Título:</span> <span class="preview-value">${data.title}</span></div>`;
-    }
-
-    if (data.address) {
-        html += `<div class="preview-item"><span class="preview-label">Dirección:</span> <span class="preview-value">${data.address}</span></div>`;
-    }
-
-    if (data.price) {
-        html += `<div class="preview-item"><span class="preview-label">Precio:</span> <span class="preview-value">${data.price}€/mes</span></div>`;
-    }
-
-    if (data.zone) {
-        html += `<div class="preview-item"><span class="preview-label">Zona:</span> <span class="preview-value">${data.zone}</span></div>`;
-    }
-
-    if (data.link) {
-        html += `<div class="preview-item"><span class="preview-label">Link:</span> <span class="preview-value">${data.link.substring(0, 50)}...</span></div>`;
-    }
-
-    previewContent.innerHTML = html;
-    preview.classList.add('show');
-}
-
-// Guardar apartamento en la API
-async function saveApartment() {
-    if (!extractedData) {
-        showStatus('error', '❌ No hay datos para guardar');
-        return;
-    }
-
-    // Obtener configuración
-    const result = await chrome.storage.sync.get(['apiUrl', 'apiKey']);
-
-    if (!result.apiUrl || !result.apiKey) {
-        showStatus('error', '❌ Configura la API primero');
-        switchTab('config');
-        return;
-    }
-
-    const saveBtn = document.getElementById('save-btn');
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<span class="spinner"></span>Guardando...';
-    showStatus('info', '🔄 Guardando apartamento...');
-
-    try {
-        const response = await fetch(`${result.apiUrl}/api/apartments/from-extension`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': result.apiKey
-            },
-            body: JSON.stringify(extractedData)
+        // Inyectar y ejecutar el script de contenido
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            function: extractFavorites
         });
 
-        const data = await response.json();
+        if (results && results[0] && results[0].result) {
+            const apartments = results[0].result;
 
-        if (response.ok && data.success) {
-            showStatus('success', '✅ Apartamento guardado exitosamente!');
-            saveBtn.innerHTML = '✅ Guardado';
+            if (apartments.length === 0) {
+                showStatus('No se encontraron favoritos en esta página', 'info');
+                syncBtn.disabled = false;
+                return;
+            }
 
-            // Reset después de 2 segundos
-            setTimeout(() => {
-                saveBtn.classList.add('hidden');
-                document.getElementById('apartment-preview').classList.remove('show');
-                extractedData = null;
-            }, 2000);
+            // Enviar cada apartamento al API
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const apt of apartments) {
+                try {
+                    const response = await fetch(`${apiUrl}/api/apartments/extension`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-API-Key': apiKey
+                        },
+                        body: JSON.stringify({
+                            ...apt,
+                            usdRate: usdRate
+                        })
+                    });
+
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        errorCount++;
+                        console.error('Error saving apartment:', await response.text());
+                    }
+                } catch (error) {
+                    errorCount++;
+                    console.error('Error:', error);
+                }
+            }
+
+            showStatus(
+                `✓ Sincronización completa: ${successCount} guardados, ${errorCount} errores`,
+                errorCount === 0 ? 'success' : 'info'
+            );
         } else {
-            throw new Error(data.error || 'Error desconocido');
+            showStatus('No se pudieron extraer los favoritos', 'error');
         }
+
+        syncBtn.disabled = false;
     } catch (error) {
-        console.error('Error guardando:', error);
-        showStatus('error', '❌ Error: ' + error.message);
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '💾 Guardar apartamento';
+        console.error('Error:', error);
+        showStatus(`Error: ${error.message}`, 'error');
+        syncBtn.disabled = false;
     }
-}
+});
 
-// Mostrar mensajes de estado
-function showStatus(type, message) {
-    const statusDiv = document.getElementById('status');
-    statusDiv.className = `status ${type}`;
-    statusDiv.textContent = message;
-    statusDiv.style.display = 'block';
+// Función que se inyecta en la página de ZonaProp para extraer favoritos
+function extractFavorites() {
+    const apartments = [];
 
-    // Auto-ocultar después de 5 segundos (excepto errores)
-    if (type !== 'error') {
-        setTimeout(() => {
-            statusDiv.style.display = 'none';
-        }, 5000);
-    }
+    // Buscar todos los elementos de propiedad en la página
+    // Este selector puede necesitar ajustes según la estructura actual de ZonaProp
+    const propertyCards = document.querySelectorAll('[data-qa="posting PROPERTY"]');
+
+    propertyCards.forEach(card => {
+        try {
+            // Extraer precio
+            const priceElement = card.querySelector('[data-qa="POSTING_CARD_PRICE"]');
+            let priceText = priceElement ? priceElement.textContent.trim() : '';
+
+            // Extraer expensas
+            const expensesElement = card.querySelector('[data-qa="expensas"]');
+            let expensesText = expensesElement ? expensesElement.textContent.trim() : '';
+
+            // Extraer dirección
+            const addressElement = card.querySelector('[data-qa="POSTING_CARD_LOCATION"]');
+            const address = addressElement ? addressElement.textContent.trim() : '';
+
+            // Extraer link
+            const linkElement = card.querySelector('a[data-qa="posting-link"]');
+            const link = linkElement ? linkElement.href : '';
+
+            // Extraer título
+            const titleElement = card.querySelector('[data-qa="POSTING_CARD_DESCRIPTION"]');
+            const title = titleElement ? titleElement.textContent.trim() : '';
+
+            // Extraer características (ambientes, m2, etc.)
+            const characteristicsElements = card.querySelectorAll('[data-qa="POSTING_CARD_FEATURES"] span');
+            let rooms = null;
+            let squareMeters = null;
+            let bathrooms = null;
+
+            characteristicsElements.forEach(el => {
+                const text = el.textContent.trim();
+                if (text.includes('amb')) {
+                    rooms = parseInt(text);
+                } else if (text.includes('m²')) {
+                    squareMeters = parseFloat(text.replace(/[^\d.]/g, ''));
+                } else if (text.includes('baño')) {
+                    bathrooms = parseInt(text);
+                }
+            });
+
+            // Parsear precio y moneda
+            let priceARS = 0;
+            let currency = 'ARS';
+
+            if (priceText.includes('USD')) {
+                currency = 'USD';
+                priceARS = parseFloat(priceText.replace(/[^\d.]/g, ''));
+            } else {
+                priceARS = parseFloat(priceText.replace(/[^\d.]/g, ''));
+            }
+
+            // Parsear expensas
+            let expenses = 0;
+            if (expensesText) {
+                expenses = parseFloat(expensesText.replace(/[^\d.]/g, ''));
+            }
+
+            if (address && (priceARS > 0 || currency === 'USD')) {
+                apartments.push({
+                    title,
+                    address,
+                    priceARS,
+                    currency,
+                    expenses,
+                    link,
+                    rooms,
+                    bathrooms,
+                    squareMeters
+                });
+            }
+        } catch (error) {
+            console.error('Error extracting apartment:', error);
+        }
+    });
+
+    return apartments;
 }

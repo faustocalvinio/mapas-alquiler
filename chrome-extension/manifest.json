@@ -1,32 +1,34 @@
 {
    "manifest_version": 3,
-   "name": "Idealista to Mapas Alquiler",
+   "name": "ZonaProp to Mapas Alquiler",
    "version": "1.0.0",
-   "description": "Agrega apartamentos de Idealista a tu aplicación Mapas Alquiler con un solo click",
-   "permissions": ["activeTab", "storage"],
+   "description": "Guarda tus favoritos de ZonaProp en tu aplicación de mapas",
+   "permissions": ["storage", "activeTab", "scripting"],
    "host_permissions": [
-      "https://www.idealista.com/*",
-      "http://localhost:3000/*",
-      "https://*.vercel.app/*",
-      "https://mapa.facal.space/*"
+      "https://www.zonaprop.com.ar/*",
+      "http://localhost:3000/*"
    ],
    "action": {
       "default_popup": "popup.html",
       "default_icon": {
-         "16": "icons/icon16.svg",
-         "48": "icons/icon48.svg",
-         "128": "icons/icon128.svg"
+         "16": "icons/icon16.png",
+         "48": "icons/icon48.png",
+         "128": "icons/icon128.png"
       }
    },
-   "icons": {
-      "16": "icons/icon16.svg",
-      "48": "icons/icon48.svg",
-      "128": "icons/icon128.svg"
+   "background": {
+      "service_worker": "background.js"
    },
    "content_scripts": [
       {
-         "matches": ["https://www.idealista.com/*"],
-         "js": ["content.js"]
+         "matches": ["https://www.zonaprop.com.ar/*"],
+         "js": ["content.js"],
+         "run_at": "document_idle"
       }
-   ]
+   ],
+   "icons": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+   }
 }
