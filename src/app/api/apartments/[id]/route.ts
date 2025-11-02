@@ -6,12 +6,13 @@ import { prisma } from "@/lib/prisma";
 // GET - Obtener un apartamento por ID
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const apartment = await prisma.apartment.findUnique({
             where: {
-                id: params.id,
+                id,
             },
             include: {
                 user: {
@@ -43,9 +44,10 @@ export async function GET(
 // DELETE - Eliminar un apartamento
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
 
         if (!session?.user?.email) {
@@ -68,7 +70,7 @@ export async function DELETE(
 
         await prisma.apartment.delete({
             where: {
-                id: params.id,
+                id,
             },
         });
 
@@ -85,9 +87,10 @@ export async function DELETE(
 // PATCH - Actualizar un apartamento
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions);
 
         if (!session?.user?.email) {
@@ -112,7 +115,7 @@ export async function PATCH(
 
         const apartment = await prisma.apartment.update({
             where: {
-                id: params.id,
+                id,
             },
             data: body,
             include: {

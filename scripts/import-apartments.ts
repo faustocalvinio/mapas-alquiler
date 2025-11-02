@@ -56,7 +56,7 @@ async function importApartments() {
                         data: {
                             title: record.title || null,
                             address: record.address,
-                            price: parseInt(record.price) || 0,
+                            priceUSD: parseFloat(record.price) || 0,
                             zone: record.zone || null,
                             lat: parseFloat(record.lat),
                             lng: parseFloat(record.lng),
@@ -78,7 +78,7 @@ async function importApartments() {
                             id: record.id,
                             title: record.title || null,
                             address: record.address,
-                            price: parseInt(record.price) || 0,
+                            priceUSD: parseFloat(record.price) || 0,
                             zone: record.zone || null,
                             lat: parseFloat(record.lat),
                             lng: parseFloat(record.lng),
